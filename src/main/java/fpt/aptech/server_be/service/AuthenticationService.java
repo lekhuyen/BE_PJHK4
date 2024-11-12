@@ -1,5 +1,10 @@
 package fpt.aptech.server_be.service;
 
+import com.nimbusds.jose.*;
+import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jose.crypto.MACVerifier;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
 import fpt.aptech.server_be.dto.request.AuthenticationRequest;
 import fpt.aptech.server_be.dto.request.IntrospectRequest;
 import fpt.aptech.server_be.dto.response.AuthenticationResponse;
