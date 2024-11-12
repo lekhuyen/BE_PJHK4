@@ -18,11 +18,16 @@ public class UserService {
     public User createUser(UserCreationRequest request) {
         User user = new User();
 
+        if(userRepository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("Email already exists");
+        }
+
         user.setName(request.getName());
         user.setPassword(request.getPassword());
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
         user.setDob(request.getDob());
+        user.setEmail(request.getEmail());
 
        return userRepository.save(user);
     }
@@ -43,6 +48,7 @@ public class UserService {
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
         user.setDob(request.getDob());
+        user.setEmail(request.getEmail());
 
         return userRepository.save(user);
     }
