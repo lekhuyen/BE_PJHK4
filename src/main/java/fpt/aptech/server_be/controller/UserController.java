@@ -3,9 +3,13 @@ package fpt.aptech.server_be.controller;
 import fpt.aptech.server_be.dto.request.ApiResponse;
 import fpt.aptech.server_be.dto.request.UserCreationRequest;
 import fpt.aptech.server_be.dto.request.UserUpdateRequest;
+import fpt.aptech.server_be.dto.response.UserResponse;
 import fpt.aptech.server_be.entities.User;
 import fpt.aptech.server_be.service.UserService;
 import jakarta.validation.Valid;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,9 +17,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/users")
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserController {
-    @Autowired
-    private UserService userService;
+
+    UserService userService;
 
     @PostMapping
     ApiResponse<User> createUser(@RequestBody @Valid UserCreationRequest request) {
@@ -26,17 +32,18 @@ public class UserController {
     }
 
     @GetMapping
-    List<User> getAllUsers() {
+    List<UserResponse> getAllUsers() {
         return userService.getAllUsers();
     }
 
     @GetMapping("/{userId}")
-    User getUserById(@PathVariable String userId) {
+    UserResponse getUserById(@PathVariable String userId) {
+
         return userService.getUserById(userId);
     }
 
     @PutMapping("/{userId}")
-    User updateUser(@PathVariable String userId, @RequestBody UserUpdateRequest request) {
+    boolean updateUser(@PathVariable String userId, @RequestBody UserUpdateRequest request) {
         return userService.updateUser(userId, request);
     }
 
