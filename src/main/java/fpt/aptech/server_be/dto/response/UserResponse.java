@@ -1,22 +1,18 @@
-package fpt.aptech.server_be.entities;
+package fpt.aptech.server_be.dto.response;
 
-import jakarta.persistence.*;
+import fpt.aptech.server_be.entities.User;
+import jakarta.persistence.Entity;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
-
-@Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Table(name = "users")
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+public class UserResponse {
     String id;
     String name;
     String password;
@@ -25,5 +21,6 @@ public class User {
     String email;
     LocalDate dob;
 
-
+    public UserResponse(User userUpdated) {
+    }
 }
