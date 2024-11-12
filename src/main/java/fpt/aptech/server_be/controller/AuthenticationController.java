@@ -1,11 +1,8 @@
 package fpt.aptech.server_be.controller;
 
-import com.nimbusds.jose.JOSEException;
 import fpt.aptech.server_be.dto.request.ApiResponse;
 import fpt.aptech.server_be.dto.request.AuthenticationRequest;
-import fpt.aptech.server_be.dto.request.IntrospectRequest;
 import fpt.aptech.server_be.dto.response.AuthenticationResponse;
-import fpt.aptech.server_be.dto.response.IntrospectResponse;
 import fpt.aptech.server_be.service.AuthenticationService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.text.ParseException;
 
 @RestController
 @RequestMapping("/auth")
