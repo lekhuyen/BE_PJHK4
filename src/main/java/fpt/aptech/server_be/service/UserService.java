@@ -3,6 +3,8 @@ package fpt.aptech.server_be.service;
 import fpt.aptech.server_be.dto.request.UserCreationRequest;
 import fpt.aptech.server_be.dto.request.UserUpdateRequest;
 import fpt.aptech.server_be.entities.User;
+import fpt.aptech.server_be.exception.AppException;
+import fpt.aptech.server_be.exception.ErrorCode;
 import fpt.aptech.server_be.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,7 +21,7 @@ public class UserService {
         User user = new User();
 
         if(userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already exists");
+            throw new AppException(ErrorCode.USER_EXISTED);
         }
 
         user.setName(request.getName());
