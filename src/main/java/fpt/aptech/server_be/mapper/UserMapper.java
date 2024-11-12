@@ -26,11 +26,11 @@ public class UserMapper {
         UserResponse userResponse = new UserResponse();
         userResponse.setId(user.getId());
         userResponse.setName(user.getName());
-        userResponse.setPassword(user.getPassword());
         userResponse.setFirstName(user.getFirstName());
         userResponse.setLastName(user.getLastName());
         userResponse.setDob(user.getDob());
         userResponse.setEmail(user.getEmail());
+        userResponse.setRoles(user.getRoles());
         return userResponse;
     }
 
