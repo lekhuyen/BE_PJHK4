@@ -9,6 +9,7 @@ import fpt.aptech.server_be.dto.request.AuthenticationRequest;
 import fpt.aptech.server_be.dto.request.IntrospectRequest;
 import fpt.aptech.server_be.dto.response.AuthenticationResponse;
 import fpt.aptech.server_be.dto.response.IntrospectResponse;
+import fpt.aptech.server_be.entities.User;
 import fpt.aptech.server_be.exception.AppException;
 import fpt.aptech.server_be.exception.ErrorCode;
 import fpt.aptech.server_be.repositories.UserRepository;
@@ -21,11 +22,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.StringJoiner;
 
 @Slf4j
 @Service
@@ -52,24 +55,24 @@ public class AuthenticationService {
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
 
-        var token = generateToken(user.getEmail());
+        var token = generateToken(user);
         return AuthenticationResponse.builder()
                 .token(token)
                 .authenticated(true)
                 .build();
     }
 
-    private String generateToken(String username) {
+    private String generateToken(User user) {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                .subject(username)
-                .issuer(username)
+                .subject(user.getEmail())
+                .issuer(user.getEmail())
                 .issueTime(new Date())
                 .expirationTime(new Date(
                         Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()
                 ))
-                .claim("customeclaim", "Custom")
+                .claim("scope", buildScope(user))
                 .build();
 
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
@@ -104,5 +107,17 @@ public class AuthenticationService {
        return IntrospectResponse.builder()
                .valid(verified && expiryTime.after(new Date()))
                .build();
+    }
+
+    //lay ra roles cua user
+    private String buildScope(User user) {
+        StringJoiner stringJoiner = new StringJoiner(" ");
+        if(!CollectionUtils.isEmpty(user.getRoles())){
+            user.getRoles().forEach(stringJoiner::add);
+//            user.getRoles().forEach(s -> stringJoiner.add(s));
+
+        }
+        return stringJoiner.toString();
+
     }
 }
