@@ -1,13 +1,55 @@
 package fpt.aptech.server_be.exception;
 
+import fpt.aptech.server_be.dto.request.ApiResponse;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
-    @ExceptionHandler(value = RuntimeException.class)
-    ResponseEntity<String> handlingRuntimeException(RuntimeException exception) {
-        return ResponseEntity.badRequest().body(exception.getMessage());
+    // email existed
+    @ExceptionHandler(value = Exception.class)
+    ResponseEntity<ApiResponse> handlingRuntimeException(RuntimeException exception) {
+        ApiResponse apiResponse = new ApiResponse();
+
+        apiResponse.setMessage(ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage());
+        apiResponse.setCode(ErrorCode.UNCATEGORIZED_EXCEPTION.getCode());
+
+        return ResponseEntity.badRequest().body(apiResponse);
+    }
+
+//validation trong entity
+    @ExceptionHandler(value = MethodArgumentNotValidException.class)
+    ResponseEntity<ApiResponse> handlingMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
+
+        String enumkey = exception.getFieldError().getDefaultMessage();
+//        ErrorCode errorCode = ErrorCode.valueOf(enumkey);
+        ErrorCode errorCode = ErrorCode.INVALID_KEY;
+
+        try{
+            errorCode = ErrorCode.valueOf(enumkey);
+        }catch(IllegalArgumentException e){
+
+        }
+
+        ApiResponse apiResponse = new ApiResponse();
+        apiResponse.setMessage(errorCode.getMessage());
+        apiResponse.setCode(errorCode.getCode());
+
+        return ResponseEntity.badRequest().body(apiResponse);
+    }
+
+    @ExceptionHandler(value = AppException.class)
+    ResponseEntity<ApiResponse> handlingAppExceptionException(AppException exception) {
+
+        ErrorCode errorCode = exception.getErrorCode();
+
+        ApiResponse apiResponse = new ApiResponse();
+
+        apiResponse.setMessage(errorCode.getMessage());
+        apiResponse.setCode(errorCode.getCode());
+
+        return ResponseEntity.badRequest().body(apiResponse);
     }
 }
