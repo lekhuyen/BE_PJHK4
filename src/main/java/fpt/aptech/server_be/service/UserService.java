@@ -55,7 +55,7 @@ public class UserService {
     }
 
 //    @PreAuthorize("hasRole('ADMIN')")
-    @PreAuthorize("hasAuthority('APPROVE_POST')")
+//    @PreAuthorize("hasAuthority('APPROVE_POST')")
     public List<UserResponse> getAllUsers() {
         List<User> users = userRepository.findAll();
         return users.stream().map(UserMapper::toUserResponse).collect(Collectors.toList());
