@@ -29,7 +29,7 @@ public class SecurityConfig {
 
 //    endpoint cho phep truy cap k can login
     private final String[] PUBLIC_ENDPOINTS = {
-            "/users","/auth/login", "/auth/introspect"
+            "/users","/auth/login", "/auth/introspect","/users/addImage/**"
     };
 
     @NonFinal

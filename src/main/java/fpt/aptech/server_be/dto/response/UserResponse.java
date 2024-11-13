@@ -21,6 +21,8 @@ public class UserResponse {
     String lastName;
     String email;
     LocalDate dob;
+    String ciNumber;
+    String address;
     Set<RoleResponse> roles;
 
     public UserResponse(User userUpdated) {
