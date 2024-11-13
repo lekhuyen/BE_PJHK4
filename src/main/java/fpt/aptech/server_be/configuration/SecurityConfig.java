@@ -2,6 +2,7 @@ package fpt.aptech.server_be.configuration;
 
 import fpt.aptech.server_be.enums.Role;
 import lombok.experimental.NonFinal;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,18 +30,25 @@ public class SecurityConfig {
 
 //    endpoint cho phep truy cap k can login
     private final String[] PUBLIC_ENDPOINTS = {
-            "/users","/auth/login", "/auth/introspect","/users/addImage/**"
+            "/users","/auth/login", "/auth/introspect",
+            "/auth/logout",
+            "/auth/refresh",
+            "/users/addImage/**",
     };
 
-    @NonFinal
-    @Value("${jwt.signerKey}")
-    protected String SIGNER_KEY;
+//    @NonFinal
+//    @Value("${jwt.signerKey}")
+//    protected String SIGNER_KEY;
+
+    @Autowired
+    private CustomJwtDecoder customJwtDecoder;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.authorizeHttpRequests(request ->
                 //cho phep truy cap
-                request.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
+                request
+                        .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
 
                         //user co role admin moi truy cap dc
 //                        .requestMatchers(HttpMethod.GET,"/users")
@@ -51,7 +59,9 @@ public class SecurityConfig {
                         .anyRequest().authenticated());
 //authen voi token, neu hop le se cho rest api
         httpSecurity.oauth2ResourceServer(oauth2 ->
-                oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder())
+                oauth2.jwt(jwtConfigurer -> jwtConfigurer
+                                            .decoder(customJwtDecoder)
+//                oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder())
                         //    custom SCOPE_ADMIN -> ROLE_ADMIN
                         .jwtAuthenticationConverter(jwtConverter()))
                         .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
@@ -80,14 +90,14 @@ public class SecurityConfig {
 
 
 //    decode token xem co hop le k,
-    @Bean
-    JwtDecoder jwtDecoder() {
-        SecretKeySpec secretKeySpec = new SecretKeySpec(SIGNER_KEY.getBytes(), "HS512");
-        return NimbusJwtDecoder
-                .withSecretKey(secretKeySpec)
-                .macAlgorithm(MacAlgorithm.HS512)
-                .build();
-    }
+//    @Bean
+//    JwtDecoder jwtDecoder() {
+//        SecretKeySpec secretKeySpec = new SecretKeySpec(SIGNER_KEY.getBytes(), "HS512");
+//        return NimbusJwtDecoder
+//                .withSecretKey(secretKeySpec)
+//                .macAlgorithm(MacAlgorithm.HS512)
+//                .build();
+//    }
 
     @Bean
     PasswordEncoder passwordEncoder() {

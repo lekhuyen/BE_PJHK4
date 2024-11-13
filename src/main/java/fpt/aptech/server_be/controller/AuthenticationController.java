@@ -1,9 +1,7 @@
 package fpt.aptech.server_be.controller;
 
 import com.nimbusds.jose.JOSEException;
-import fpt.aptech.server_be.dto.request.ApiResponse;
-import fpt.aptech.server_be.dto.request.AuthenticationRequest;
-import fpt.aptech.server_be.dto.request.IntrospectRequest;
+import fpt.aptech.server_be.dto.request.*;
 import fpt.aptech.server_be.dto.response.AuthenticationResponse;
 import fpt.aptech.server_be.dto.response.IntrospectResponse;
 import fpt.aptech.server_be.service.AuthenticationService;
@@ -44,6 +42,23 @@ public class AuthenticationController {
                .code(1000)
                .result(result)
                .build();
+    }
+
+    @PostMapping("/logout")
+    ApiResponse<Void> logout(@RequestBody LogoutRequest request) throws ParseException, JOSEException {
+        authenticationService.logout(request);
+        return ApiResponse.<Void>builder()
+                .build();
+    }
+
+    @PostMapping("/refresh")
+    ApiResponse<AuthenticationResponse> refreshToken(@RequestBody RefreshRequest request)
+            throws ParseException, JOSEException {
+
+       var result = authenticationService.refreshToken(request);
+        return ApiResponse.<AuthenticationResponse>builder()
+                .result(result)
+                .build();
     }
 
 }
