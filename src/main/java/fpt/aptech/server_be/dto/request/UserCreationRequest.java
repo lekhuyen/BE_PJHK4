@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserCreationRequest {
-    @Size(min = 4, message = "USERNAME_INVALID")
+//    @Size(min = 4, message = "USERNAME_INVALID")
     String name;
     @Size(min = 4, max = 20, message = "INVALID_PASSWORD")
     String password;
