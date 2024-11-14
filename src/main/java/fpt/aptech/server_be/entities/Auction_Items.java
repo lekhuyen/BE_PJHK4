@@ -26,13 +26,12 @@ public class Auction_Items {
     Double starting_price;
     LocalDate start_date;
     LocalDate end_date;
-    Integer sellerId;
     String bid_step;
     String status;
 
 
     @ManyToOne
-    @JoinColumn(name = "user_Id", referencedColumnName = "id")
+    @JoinColumn(name = "seller_Id", referencedColumnName = "id")
     User user;
 
     // Many-to-one relationship with Category

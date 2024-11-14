@@ -22,8 +22,6 @@ public class Category {
     Integer category_id;
     String category_name;
     String description;
-    String item_id;
-
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
     List<Auction_Items> auctionItems;
