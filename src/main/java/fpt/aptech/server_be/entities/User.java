@@ -29,7 +29,6 @@ public class User {
     String lastName;
     String email;
     LocalDate dob;
-
     String ciNumber;
     String address;
 

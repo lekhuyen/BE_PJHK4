@@ -39,7 +39,7 @@ public class SecurityConfig {
             "/auth/introspect",
             "/auth/logout",
             "/auth/refresh",
-            "/users/addImage/**",
+            "/users/addImage/**",   // File upload
     };
 
     private final String[] PUBLIC_ENDPOINTS_GET = {
