@@ -4,6 +4,7 @@ import com.nimbusds.jose.JOSEException;
 import fpt.aptech.server_be.dto.request.IntrospectRequest;
 import fpt.aptech.server_be.service.AuthenticationService;
 import lombok.experimental.NonFinal;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
@@ -17,6 +18,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.text.ParseException;
 import java.util.Objects;
 
+@Slf4j
 @Component
 public class CustomJwtDecoder implements JwtDecoder {
 
@@ -39,7 +41,7 @@ public class CustomJwtDecoder implements JwtDecoder {
                     .build());
 
           if(!response.isValid()){
-              throw new JwtException("invalid token");
+              log.info("invalid token ");
 
           }
         } catch (JOSEException | ParseException e) {
