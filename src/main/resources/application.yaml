@@ -13,3 +13,8 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.SQLServerDialect
+
+jwt:
+  signerKey: "pDozQy8Ihk/phzNwDBNzRmuWvnA6YkDg/D1mmO4FpejrQJ3kVTf10AcELK1qJnGW"
+  valid-duration: 3600 #second
+  refreshtable-duration: 360000

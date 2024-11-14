@@ -3,20 +3,15 @@ package fpt.aptech.server_be.dto.request;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.time.LocalDate;
-import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserUpdateRequest {
+public class RoleRequest {
     String name;
-    String password;
-    String firstName;
-    String lastName;
-    String email;
-    LocalDate dob;
-    List<String> roles;
+    String description;
+    Set<String> permissions;
 }
