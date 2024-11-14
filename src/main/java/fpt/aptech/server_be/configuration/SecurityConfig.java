@@ -29,11 +29,23 @@ import javax.crypto.spec.SecretKeySpec;
 public class SecurityConfig {
 
 //    endpoint cho phep truy cap k can login
-    private final String[] PUBLIC_ENDPOINTS = {
-            "/users","/auth/login", "/auth/introspect",
+    private final String[] PUBLIC_ENDPOINTS_POST = {
+            "/users",
+            "/auth/login",
+            "/auth/introspect",
             "/auth/logout",
             "/auth/refresh",
             "/users/addImage/**",
+    };
+
+    private final String[] PUBLIC_ENDPOINTS_GET = {
+
+    };
+    private final String[] PUBLIC_ENDPOINTS_DELETE = {
+            "/users/**"
+    };
+    private final String[] PUBLIC_ENDPOINTS_PUT = {
+            "/users/**"
     };
 
 //    @NonFinal
@@ -48,7 +60,10 @@ public class SecurityConfig {
         httpSecurity.authorizeHttpRequests(request ->
                 //cho phep truy cap
                 request
-                        .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
+                        .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS_POST).permitAll()
+                        .requestMatchers(HttpMethod.GET, PUBLIC_ENDPOINTS_GET).permitAll()
+                        .requestMatchers(HttpMethod.DELETE, PUBLIC_ENDPOINTS_DELETE).permitAll()
+                        .requestMatchers(HttpMethod.PUT, PUBLIC_ENDPOINTS_PUT).permitAll()
 
                         //user co role admin moi truy cap dc
 //                        .requestMatchers(HttpMethod.GET,"/users")
