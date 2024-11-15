@@ -5,7 +5,11 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
+
+import java.util.List;
+
 import java.util.Set;
+
 
 @Entity
 @Getter
@@ -31,4 +35,7 @@ public class User {
     @ManyToMany
     Set<Role> roles;
 
+// One-to-many relationship with Auction_Items
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    List<Auction_Items> auctionItems;
 }
