@@ -3,6 +3,7 @@ package fpt.aptech.server_be.mapper;
 import fpt.aptech.server_be.dto.request.Auction_ItemsRequest;
 import fpt.aptech.server_be.dto.response.Auction_ItemsRespone;
 import fpt.aptech.server_be.entities.Auction_Items;
+import org.mapstruct.Mapper;
 
 
 @Mapper
