@@ -30,7 +30,9 @@ public class UserMapper {
     }
     public static UserResponse toUserResponse(User user){
 
-
+        if(user == null){
+            return null;
+        }
 
         UserResponse userResponse = new UserResponse();
         userResponse.setId(user.getId());
@@ -41,7 +43,7 @@ public class UserMapper {
         userResponse.setEmail(user.getEmail());
         userResponse.setCiNumber(user.getCiNumber());
         userResponse.setAddress(user.getAddress());
-        userResponse.setRoles(convertRoles(user.getRoles()));
+        userResponse.setRoles(convertRoles(user.getRoles()) != null ? convertRoles(user.getRoles()) : new HashSet<>());
         return userResponse;
     }
 

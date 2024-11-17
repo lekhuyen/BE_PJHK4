@@ -19,7 +19,7 @@ public class Auction_Items {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Integer item_id;
+    int item_id;
     String item_name;
     String description;
     String images;

@@ -12,9 +12,9 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Auction_ItemsRespone {
+public class Auction_ItemsResponse {
 
-    Integer item_id;
+    int item_id;
     String item_name;
     String description;
     String images;
@@ -24,8 +24,9 @@ public class Auction_ItemsRespone {
     String bid_step;
     String status;
 
-    Category category;
+    CategoryResponse category;
+    UserResponse user;
 
-    public Auction_ItemsRespone(Auction_Items auctionItems) {
+    public Auction_ItemsResponse(Auction_Items auctionItems) {
     }
 }
