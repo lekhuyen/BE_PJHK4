@@ -40,16 +40,20 @@ public class SecurityConfig {
             "/auth/logout",
             "/auth/refresh",
             "/users/addImage/**",   // File upload
+            "/api/auction/**",
     };
 
     private final String[] PUBLIC_ENDPOINTS_GET = {
             "/users",
+            "/api/auction/**",
     };
     private final String[] PUBLIC_ENDPOINTS_DELETE = {
-            "/users/**"
+            "/users/**",
+            "/api/auction/**",
     };
     private final String[] PUBLIC_ENDPOINTS_PUT = {
-            "/users/**"
+            "/users/**",
+            "/api/auction/**",
     };
 
 //    @NonFinal
@@ -68,6 +72,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, PUBLIC_ENDPOINTS_GET).permitAll()
                         .requestMatchers(HttpMethod.DELETE, PUBLIC_ENDPOINTS_DELETE).permitAll()
                         .requestMatchers(HttpMethod.PUT, PUBLIC_ENDPOINTS_PUT).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/category/**").permitAll()
+
+                        .requestMatchers("/ws/**").permitAll()
 
                         //user co role admin moi truy cap dc
 //                        .requestMatchers(HttpMethod.GET,"/users")
@@ -128,9 +135,11 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
 
+//        corsConfiguration.addAllowedOrigin("*");
         corsConfiguration.addAllowedOrigin("http://localhost:3000");
         corsConfiguration.addAllowedMethod("*");
         corsConfiguration.addAllowedHeader("*");
+        corsConfiguration.setAllowCredentials(true);
 
 
         UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource = new UrlBasedCorsConfigurationSource();

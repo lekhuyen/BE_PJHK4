@@ -11,11 +11,11 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CategoryRespone {
+public class CategoryResponse {
     Integer category_id;
     String category_name;
     String description;
 
-    public CategoryRespone(CategoryRespone categoryRespone) {
+    public CategoryResponse(CategoryResponse categoryRespone) {
     }
 }

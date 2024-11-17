@@ -10,7 +10,7 @@ public enum ErrorCode {
     INVALID_KEY(1001,"Invalid message key", HttpStatus.BAD_REQUEST),
 
     //nhung exception k mong muon xay ra se vo day
-    UNCATEGORIZED_EXCEPTION(9999,"Uncategorized error",HttpStatus.INTERNAL_SERVER_ERROR),
+//    UNCATEGORIZED_EXCEPTION(9999,"Uncategorized error",HttpStatus.INTERNAL_SERVER_ERROR),
     USER_EXISTED(1001, "User already exists",HttpStatus.BAD_REQUEST),
     USERNAME_INVALID(1003,"Username must be at least 4 characters",HttpStatus.BAD_REQUEST),
     INVALID_PASSWORD(1004,"Password must be at least 4 characters",HttpStatus.BAD_REQUEST),

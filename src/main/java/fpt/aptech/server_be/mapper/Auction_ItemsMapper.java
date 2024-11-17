@@ -1,8 +1,12 @@
 package fpt.aptech.server_be.mapper;
 
 import fpt.aptech.server_be.dto.request.Auction_ItemsRequest;
-import fpt.aptech.server_be.dto.response.Auction_ItemsRespone;
+import fpt.aptech.server_be.dto.response.Auction_ItemsResponse;
+import fpt.aptech.server_be.dto.response.CategoryResponse;
+import fpt.aptech.server_be.dto.response.UserResponse;
 import fpt.aptech.server_be.entities.Auction_Items;
+import fpt.aptech.server_be.entities.Category;
+import fpt.aptech.server_be.entities.User;
 import org.mapstruct.Mapper;
 
 
@@ -11,6 +15,11 @@ public class Auction_ItemsMapper {
 
     // Helper method to set common fields for Auction_Items
     private static void mapCommonFields(Auction_ItemsRequest request, Auction_Items auctionItems) {
+
+        User user = new User();
+        user.setId(request.getUserId());
+
+        auctionItems.setUser(user);
         auctionItems.setItem_name(request.getItem_name());
         auctionItems.setDescription(request.getDescription());
         auctionItems.setImages(request.getImages());
@@ -28,17 +37,44 @@ public class Auction_ItemsMapper {
         return auctionItems;
     }
 
-    // Convert Auction_Items to Auction_ItemsRespone
-    public static Auction_ItemsRespone toAuction_ItemsRespone(Auction_Items auctionItems) {
-        Auction_ItemsRespone response = new Auction_ItemsRespone();
+    // Convert Auction_Items to Auction_ItemsResponse
+    public static Auction_ItemsResponse toAuction_ItemsResponse(Auction_Items auctionItems) {
+
+        Auction_ItemsResponse response = new Auction_ItemsResponse();
+
         response.setItem_id(auctionItems.getItem_id());
-        mapCommonFields(auctionItems, response);  // Set common fields
-        response.setCategory(auctionItems.getCategory());  // Assuming category is set properly
+        response.setItem_name(auctionItems.getItem_name());
+        response.setDescription(auctionItems.getDescription());
+        response.setImages(auctionItems.getImages());
+        response.setStarting_price(auctionItems.getStarting_price());
+        response.setStart_date(auctionItems.getStart_date());
+        response.setEnd_date(auctionItems.getEnd_date());
+        response.setBid_step(auctionItems.getBid_step());
+        response.setStatus(auctionItems.getStatus());
+        response.setUser(UserMapper.toUserResponse(auctionItems.getUser()));
+//        mapCommonFields(auctionItems, response);
+        response.setCategory(toCategoryResponse(auctionItems.getCategory()));
+
         return response;
     }
 
+//    private static UserResponse toUserResponse(User user) {
+//        UserResponse userResponse = new UserResponse();
+//
+//        userResponse.setId(user.getId());
+//        userResponse.setName(user.getName());
+//        userResponse.setEmail(user.getEmail());
+//        userResponse.setCiNumber(String.valueOf(user.getCiNumber()));
+//
+//        return userResponse;
+//    }
+
+    private static CategoryResponse toCategoryResponse(Category category){
+        return CategoryMapper.toCategoryResponse(category);
+    }
+
     // Helper method for mapping common fields from Auction_Items to Auction_ItemsRespone
-    private static void mapCommonFields(Auction_Items auctionItems, Auction_ItemsRespone response) {
+    private static void mapCommonFields(Auction_Items auctionItems, Auction_ItemsResponse response) {
         response.setItem_name(auctionItems.getItem_name());
         response.setDescription(auctionItems.getDescription());
         response.setImages(auctionItems.getImages());

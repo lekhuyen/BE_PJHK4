@@ -2,7 +2,7 @@ package fpt.aptech.server_be.mapper;
 
 import fpt.aptech.server_be.dto.request.CategoryRequest;
 
-import fpt.aptech.server_be.dto.response.CategoryRespone;
+import fpt.aptech.server_be.dto.response.CategoryResponse;
 import fpt.aptech.server_be.entities.Category;
 import org.mapstruct.Mapper;
 
@@ -18,13 +18,13 @@ public class CategoryMapper {
 
         return category;
     }
-    public static CategoryRespone toCategoryRespone(Category category){
+    public static CategoryResponse toCategoryResponse(Category category){
 
-        CategoryRespone categoryRespone = new CategoryRespone();
-        categoryRespone.setCategory_id(category.getCategory_id());
-        categoryRespone.setCategory_name(category.getCategoryName());
-        categoryRespone.setDescription(category.getDescription());
+        CategoryResponse categoryResponse = new CategoryResponse();
+        categoryResponse.setCategory_id(category.getCategory_id());
+        categoryResponse.setCategory_name(category.getCategoryName());
+        categoryResponse.setDescription(category.getDescription());
 
-        return categoryRespone;
+        return categoryResponse;
     }
 }
