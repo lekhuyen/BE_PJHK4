@@ -50,6 +50,15 @@ public class CategoryController {
                 .build();
     }
 
+    @GetMapping("/{id}")
+    public CategoryResponse getCategoryById(@PathVariable("id") int id) {
+        CategoryResponse category = categoryService.getCategoryById(id);
+        return ApiResponse.<CategoryResponse>builder()
+                .result(category)
+                .build()
+                .getResult();
+    }
+
     @DeleteMapping("/{id}")
     public ApiResponse<String> deleteCategory(@PathVariable int id) {
         categoryService.deleteCategory(id);

@@ -48,11 +48,10 @@ public class CategoryService {
 
         Category category = CategoryMapper.toCategory(categoryRequest);
         categoryRepository.save(category);
-        CategoryResponse  categoryResponse = CategoryMapper.toCategoryResponse(category);
-        return categoryResponse;
+        return CategoryMapper.toCategoryResponse(category);
     }
 
-    public boolean updateCategory(CategoryRequest request) {
+    public void updateCategory(CategoryRequest request) {
         Category category = categoryRepository.findById(request.getCategory_id()).orElseThrow(() -> new RuntimeException("Category not found"));
 
 
@@ -61,7 +60,6 @@ public class CategoryService {
 
         Category categoryUpdated = categoryRepository.save(category);
 
-        return true;
     }
 
     public void deleteCategory(int category_id) {

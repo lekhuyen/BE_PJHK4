@@ -36,6 +36,6 @@ public class Auction_Items {
 
     // Many-to-one relationship with Category
     @ManyToOne
-    @JoinColumn(name = "category_id", referencedColumnName = "category_id")
+    @JoinColumn(name = "categoryId", referencedColumnName = "category_id")
     Category category;
 }
