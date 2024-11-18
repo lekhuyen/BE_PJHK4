@@ -34,25 +34,25 @@ public class SecurityConfig {
 
 //    endpoint cho phep truy cap k can login
     private final String[] PUBLIC_ENDPOINTS_POST = {
-            "/users",
-            "/auth/login",
-            "/auth/introspect",
-            "/auth/logout",
-            "/auth/refresh",
-            "/users/addImage/**",   // File upload
+            "/api/users",
+            "/api/auth/login",
+            "/api/auth/introspect",
+            "/api/auth/logout",
+            "/api/auth/refresh",
+            "/api/users/addImage/**",   // File upload
             "/api/auction/**",
     };
 
     private final String[] PUBLIC_ENDPOINTS_GET = {
-            "/users",
+            "/api/users/**",
             "/api/auction/**",
     };
     private final String[] PUBLIC_ENDPOINTS_DELETE = {
-            "/users/**",
+            "/api/users/**",
             "/api/auction/**",
     };
     private final String[] PUBLIC_ENDPOINTS_PUT = {
-            "/users/**",
+            "/api/users/**",
             "/api/auction/**",
     };
 
