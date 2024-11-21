@@ -4,7 +4,7 @@ package fpt.aptech.server_be.controller;
 import fpt.aptech.server_be.dto.request.ApiResponse;
 import fpt.aptech.server_be.dto.request.CategoryRequest;
 import fpt.aptech.server_be.dto.response.CategoryResponse;
-import fpt.aptech.server_be.entities.Category;
+import fpt.aptech.server_be.exception.CategoryAlreadyExistsException;
 import fpt.aptech.server_be.service.CategoryService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -33,16 +33,17 @@ public class CategoryController {
                 .result(category)
                 .build();
     }
-    @MessageMapping("/category")
-    @SendTo("/topic/category")
-//    @PostMapping("/")
+//    @MessageMapping("/category")
+//    @SendTo("/topic/category")
+    @PostMapping
     ApiResponse<CategoryResponse> createCategory(@RequestBody CategoryRequest request) {
         return  ApiResponse.<CategoryResponse>builder()
+                .message("Create category successful")
                 .result(categoryService.addCategory(request))
                 .build();
     }
 
-    @GetMapping("/")
+    @GetMapping
     public ApiResponse<List<CategoryResponse>> getCategory() {
         List<CategoryResponse> category = categoryService.getAllCategories();
         return ApiResponse.<List<CategoryResponse>>builder()

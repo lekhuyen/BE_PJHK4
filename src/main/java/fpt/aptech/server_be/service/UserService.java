@@ -86,8 +86,8 @@ public class UserService {
 
         user.setName(request.getName());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setFirstName(request.getFirstName());
-        user.setLastName(request.getLastName());
+//        user.setFirstName(request.getFirstName());
+//        user.setLastName(request.getLastName());
         user.setDob(request.getDob());
         user.setEmail(request.getEmail());
 

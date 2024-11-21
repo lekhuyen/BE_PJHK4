@@ -45,7 +45,11 @@ public class UserController {
         ApiResponse<User> apiResponse = new ApiResponse<>();
         apiResponse.setResult(userService.createUser(request));
 
-       return apiResponse;
+       return ApiResponse.<User>builder()
+               .code(apiResponse.getCode())
+               .message("Register successfully")
+//               .result(apiResponse.getResult())
+               .build();
     }
 
     @GetMapping
