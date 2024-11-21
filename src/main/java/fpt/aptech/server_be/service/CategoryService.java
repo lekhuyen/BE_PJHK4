@@ -6,6 +6,9 @@ import fpt.aptech.server_be.dto.response.CategoryResponse;
 import fpt.aptech.server_be.entities.Category;
 
 
+import fpt.aptech.server_be.exception.AppException;
+import fpt.aptech.server_be.exception.CategoryAlreadyExistsException;
+import fpt.aptech.server_be.exception.ErrorCode;
 import fpt.aptech.server_be.mapper.CategoryMapper;
 
 import fpt.aptech.server_be.repositories.CategoryRepository;
@@ -42,8 +45,8 @@ public class CategoryService {
         // Check if the category already exists
         boolean categoryExists = categoryRepository.existsByCategoryName(categoryRequest.getCategory_name());
         if (categoryExists) {
-            //throw new AppException("This category already exists");
-            //throw new AppException(CategoryError.CATEGORY_CONFLICT, CategoryError.CATEGORY_CONFLICT.getCategoryHttpStatus());
+//            throw new CategoryAlreadyExistsException("Category name already exists");
+            throw new AppException(ErrorCode.CATEGORY_EXISTS);
         }
 
         Category category = CategoryMapper.toCategory(categoryRequest);

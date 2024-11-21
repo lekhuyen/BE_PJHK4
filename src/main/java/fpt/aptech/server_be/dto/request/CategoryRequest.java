@@ -17,4 +17,7 @@ public class CategoryRequest {
     String category_name;
     String description;
 
+    public CategoryRequest(String category_name) {
+        this.category_name = category_name;
+    }
 }

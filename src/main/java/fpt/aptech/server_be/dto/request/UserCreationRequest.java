@@ -17,9 +17,10 @@ public class UserCreationRequest {
     String name;
     @Size(min = 4, max = 20, message = "INVALID_PASSWORD")
     String password;
-    String firstName;
-    String lastName;
+//    String firstName;
+//    String lastName;
     String email;
     LocalDate dob;
-    List<String> roles;
+    @Builder.Default
+    List<String> roles = List.of("USER");
 }

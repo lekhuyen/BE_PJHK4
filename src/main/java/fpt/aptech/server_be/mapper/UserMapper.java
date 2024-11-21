@@ -21,8 +21,8 @@ public class UserMapper {
 
         user.setName(request.getName());
         user.setPassword(request.getPassword());
-        user.setFirstName(request.getFirstName());
-        user.setLastName(request.getLastName());
+//        user.setFirstName(request.getFirstName());
+//        user.setLastName(request.getLastName());
         user.setDob(request.getDob());
         user.setEmail(request.getEmail());
 
@@ -37,8 +37,8 @@ public class UserMapper {
         UserResponse userResponse = new UserResponse();
         userResponse.setId(user.getId());
         userResponse.setName(user.getName());
-        userResponse.setFirstName(user.getFirstName());
-        userResponse.setLastName(user.getLastName());
+//        userResponse.setFirstName(user.getFirstName());
+//        userResponse.setLastName(user.getLastName());
         userResponse.setDob(user.getDob());
         userResponse.setEmail(user.getEmail());
         userResponse.setCiNumber(user.getCiNumber());

@@ -9,6 +9,7 @@ import fpt.aptech.server_be.entities.Category;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.Mapper;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,15 +32,18 @@ public class CategoryMapper {
         categoryResponse.setCategory_id(category.getCategory_id());
         categoryResponse.setCategory_name(category.getCategoryName());
         categoryResponse.setDescription(category.getDescription());
-        categoryResponse.setAuction_items(toAuctionItemsResponse(category.getAuctionItems()));
+        categoryResponse.setAuction_items(
+                toAuctionItemsResponse(category.getAuctionItems()));
 
-        log.info(toAuctionItemsResponse(category.getAuctionItems()).toString());
+//        log.info(toAuctionItemsResponse(category.getAuctionItems()).toString());
 
         return categoryResponse;
     }
 
     public static List<Auction_ItemsResponse> toAuctionItemsResponse(List<Auction_Items> auctionItems){
-
+        if (auctionItems == null) {
+            return new ArrayList<>();
+        }
         return auctionItems.stream()
                 .map(auctionItem -> new Auction_ItemsResponse(
                     auctionItem.getItem_id(),

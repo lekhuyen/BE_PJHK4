@@ -66,7 +66,7 @@ public class AuthenticationService {
         boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
 
         if (!authenticated) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+            throw new AppException(ErrorCode.USER_NOT_EXISTED);
         }
 
         var token = generateToken(user);
@@ -117,6 +117,7 @@ public class AuthenticationService {
                 //id token
                 .jwtID(UUID.randomUUID().toString())
                 .claim("scope", buildScope(user))
+                .claim("username", user.getName())
                 .build();
 
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());

@@ -25,8 +25,8 @@ public class User {
     String id;
     String name;
     String password;
-    String firstName;
-    String lastName;
+//    String firstName;
+//    String lastName;
     String email;
     LocalDate dob;
     String ciNumber;
