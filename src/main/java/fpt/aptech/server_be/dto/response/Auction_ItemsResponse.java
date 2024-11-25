@@ -1,5 +1,6 @@
 package fpt.aptech.server_be.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import fpt.aptech.server_be.entities.Auction_Items;
 import fpt.aptech.server_be.entities.Category;
 import lombok.*;
@@ -12,9 +13,10 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Auction_ItemsRespone {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class Auction_ItemsResponse {
 
-    Integer item_id;
+    int item_id;
     String item_name;
     String description;
     String images;
@@ -24,8 +26,12 @@ public class Auction_ItemsRespone {
     String bid_step;
     String status;
 
-    Category category;
+    CategoryResponse category;
+    UserResponse user;
 
-    public Auction_ItemsRespone(Auction_Items auctionItems) {
+    public Auction_ItemsResponse(Auction_Items auctionItems) {
+    }
+
+    public Auction_ItemsResponse(int itemId, String itemName, String description, String images, Double startingPrice, LocalDate startDate, LocalDate endDate, String bidStep, String status) {
     }
 }

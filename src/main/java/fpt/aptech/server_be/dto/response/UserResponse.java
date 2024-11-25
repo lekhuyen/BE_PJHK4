@@ -17,8 +17,8 @@ import java.util.Set;
 public class UserResponse {
     String id;
     String name;
-    String firstName;
-    String lastName;
+//    String firstName;
+//    String lastName;
     String email;
     LocalDate dob;
     String ciNumber;

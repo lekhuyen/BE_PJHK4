@@ -2,10 +2,13 @@ package fpt.aptech.server_be.service;
 
 
 import fpt.aptech.server_be.dto.request.CategoryRequest;
-import fpt.aptech.server_be.dto.response.CategoryRespone;
+import fpt.aptech.server_be.dto.response.CategoryResponse;
 import fpt.aptech.server_be.entities.Category;
 
 
+import fpt.aptech.server_be.exception.AppException;
+import fpt.aptech.server_be.exception.CategoryAlreadyExistsException;
+import fpt.aptech.server_be.exception.ErrorCode;
 import fpt.aptech.server_be.mapper.CategoryMapper;
 
 import fpt.aptech.server_be.repositories.CategoryRepository;
@@ -28,30 +31,31 @@ public class CategoryService {
 
     CategoryRepository categoryRepository;
 
-    public CategoryRespone getCategoryById(Integer category_id) {
+    public CategoryResponse getCategoryById(Integer category_id) {
         Category category = categoryRepository.findById(category_id).orElseThrow(() -> new RuntimeException("Category not found"));
-        return CategoryMapper.toCategoryRespone(category);
+        return CategoryMapper.toCategoryResponse(category);
     }
 
-    public List<CategoryRespone> getAllCategories() {
+    public List<CategoryResponse> getAllCategories() {
         List<Category> categories = categoryRepository.findAll();
-        return categories.stream().map(CategoryMapper::toCategoryRespone).collect(Collectors.toList());
+        return categories.stream().map(CategoryMapper::toCategoryResponse).collect(Collectors.toList());
     }
 
-    public Category addCategory(CategoryRequest categoryRequest) {
+    public CategoryResponse addCategory(CategoryRequest categoryRequest) {
         // Check if the category already exists
         boolean categoryExists = categoryRepository.existsByCategoryName(categoryRequest.getCategory_name());
         if (categoryExists) {
-            //throw new AppException("This category already exists");
-            //throw new AppException(CategoryError.CATEGORY_CONFLICT, CategoryError.CATEGORY_CONFLICT.getCategoryHttpStatus());
+//            throw new CategoryAlreadyExistsException("Category name already exists");
+            throw new AppException(ErrorCode.CATEGORY_EXISTS);
         }
 
         Category category = CategoryMapper.toCategory(categoryRequest);
-        return categoryRepository.save(category);
+        categoryRepository.save(category);
+        return CategoryMapper.toCategoryResponse(category);
     }
 
-    public boolean updateCategory(Integer category_id, CategoryRequest request) {
-        Category category = categoryRepository.findById(category_id).orElseThrow(() -> new RuntimeException("Category not found"));
+    public void updateCategory(CategoryRequest request) {
+        Category category = categoryRepository.findById(request.getCategory_id()).orElseThrow(() -> new RuntimeException("Category not found"));
 
 
         category.setCategoryName(request.getCategory_name());
@@ -59,10 +63,9 @@ public class CategoryService {
 
         Category categoryUpdated = categoryRepository.save(category);
 
-        return categoryUpdated != null;
     }
 
-    public void deleteCategory(Integer category_id) {
+    public void deleteCategory(int category_id) {
         categoryRepository.deleteById(category_id);
     }
 }

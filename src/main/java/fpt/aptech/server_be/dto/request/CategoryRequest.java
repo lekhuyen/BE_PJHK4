@@ -13,8 +13,11 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CategoryRequest {
 
-    Integer category_id;
+    int category_id;
     String category_name;
     String description;
 
+    public CategoryRequest(String category_name) {
+        this.category_name = category_name;
+    }
 }

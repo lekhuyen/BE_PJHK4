@@ -11,7 +11,8 @@ import java.time.LocalDate;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Auction_ItemsRequest {
-
+    int item_id;
+    String userId;
     String item_name;
     String description;
     String images;
@@ -20,6 +21,6 @@ public class Auction_ItemsRequest {
     LocalDate end_date;
     String bid_step;
     String status;
-    Integer category_id;
+    int category_id;
 }
 
