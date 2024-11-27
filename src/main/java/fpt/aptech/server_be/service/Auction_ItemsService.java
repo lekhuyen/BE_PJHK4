@@ -4,6 +4,7 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import fpt.aptech.server_be.dto.request.Auction_ItemsRequest;
 import fpt.aptech.server_be.dto.response.Auction_ItemsResponse;
+import fpt.aptech.server_be.dto.response.PageResponse;
 import fpt.aptech.server_be.entities.Auction_Items;
 import fpt.aptech.server_be.entities.Category;
 import fpt.aptech.server_be.entities.User;
@@ -16,9 +17,13 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.awt.print.Pageable;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -39,13 +44,29 @@ public class Auction_ItemsService {
         return Auction_ItemsMapper.toAuction_ItemsResponse(auction_Items);
     }
 
-    public List<Auction_ItemsResponse> getAllAuction_Items() {
-        List<Auction_Items> auction_Items = auction_ItemsRepository.findAll();
+    public PageResponse<Auction_ItemsResponse> getAllAuction_Items(int page, int size) {
+//size => so luong item tren 1 trang
+        Sort sort = Sort.by( "updatedAt").descending();
+        PageRequest pageable = PageRequest.of(page - 1, size,sort);
+
+        Page<Auction_Items> auctionItemsPage = auction_ItemsRepository.findAll(pageable);
+
+
+
+
 //        auction_Items.sort(Comparator.comparing(Auction_Items::getUpdatedAt).reversed());
-        return auction_Items.stream()
-                .sorted(Comparator.comparing(Auction_Items::getUpdatedAt).reversed())
-                .map(Auction_ItemsMapper::toAuction_ItemsResponse)
-                .collect(Collectors.toList());
+//        return auction_Items.stream()
+//                .sorted(Comparator.comparing(Auction_Items::getUpdatedAt).reversed())
+//                .map(Auction_ItemsMapper::toAuction_ItemsResponse)
+//                .collect(Collectors.toList());
+        return PageResponse.<Auction_ItemsResponse>builder()
+                .currentPage(page)
+                //so luong sp moi trang
+                .pageSize(auctionItemsPage.getSize())
+                .totalPages(auctionItemsPage.getTotalPages())
+                .totalElements(auctionItemsPage.getTotalElements())
+                .data(auctionItemsPage.getContent().stream().map(Auction_ItemsMapper::toAuction_ItemsResponse).collect(Collectors.toList()))
+                .build();
     }
 
 
