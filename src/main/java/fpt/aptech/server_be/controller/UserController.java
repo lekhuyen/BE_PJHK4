@@ -53,7 +53,7 @@ public class UserController {
     }
 
     @GetMapping
-    List<UserResponse> getAllUsers() {
+    ApiResponse<List<UserResponse>> getAllUsers() {
        var authentication = SecurityContextHolder.getContext().getAuthentication();
 
        //log thong tin user
@@ -61,7 +61,10 @@ public class UserController {
         authentication.getAuthorities().forEach(grantedAuthority ->
                 log.info(grantedAuthority.getAuthority()));
 
-        return userService.getAllUsers();
+        return ApiResponse.<List<UserResponse>>builder()
+                .code(0)
+                .result(userService.getAllUsers())
+                .build();
     }
 
     @GetMapping("/{userId}")
@@ -84,10 +87,28 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
-    String deleteUser(@PathVariable String userId) {
+    public ApiResponse<Boolean> deleteUser(@PathVariable String userId) {
         userService.deleteUser(userId);
 
-        return "User deleted";
+        return ApiResponse.<Boolean>builder()
+                .code(0)
+                .message("User deleted")
+                .build();
+    }
+
+    @PutMapping("/status/{id}")
+    public ApiResponse<Boolean> updateUserStatus(@PathVariable String id) {
+        boolean isUpdate =  userService.updateStatus(id);
+        if(isUpdate) {
+            return ApiResponse.<Boolean> builder()
+                    .code(0)
+                    .message("Update user active successfully")
+                    .build();
+        }
+        return ApiResponse.<Boolean> builder()
+                .code(1)
+                .message("Update user active failed")
+                .build();
     }
 
 }

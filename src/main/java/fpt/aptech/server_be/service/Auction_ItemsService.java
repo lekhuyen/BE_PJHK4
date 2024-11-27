@@ -1,9 +1,14 @@
 package fpt.aptech.server_be.service;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import fpt.aptech.server_be.dto.request.Auction_ItemsRequest;
 import fpt.aptech.server_be.dto.response.Auction_ItemsResponse;
 import fpt.aptech.server_be.entities.Auction_Items;
 import fpt.aptech.server_be.entities.Category;
+import fpt.aptech.server_be.entities.User;
+import fpt.aptech.server_be.exception.AppException;
+import fpt.aptech.server_be.exception.ErrorCode;
 import fpt.aptech.server_be.mapper.Auction_ItemsMapper;
 import fpt.aptech.server_be.repositories.Auction_ItemsRepository;
 import fpt.aptech.server_be.repositories.CategoryRepository;
@@ -12,10 +17,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.io.IOException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -24,6 +29,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class Auction_ItemsService {
+    Cloudinary cloudinary;
 
     Auction_ItemsRepository auction_ItemsRepository;
     private final CategoryRepository categoryRepository;
@@ -41,46 +47,122 @@ public class Auction_ItemsService {
 
     public void addAuction_Items(Auction_ItemsRequest request) {
 
+        List<MultipartFile> images = request.getImages();
+
+        List<String> fileNames = new ArrayList<>();
+
+        for (MultipartFile image : images) {
+            String fileName = image.getOriginalFilename();
+
+            if(fileName != null && !fileName.isEmpty()) {
+                try {
+                    Map uploadResult = cloudinary.uploader().upload(image.getBytes(), ObjectUtils.emptyMap());
+                    String fileUrl = uploadResult.get("url").toString();
+
+                    fileNames.add(fileUrl);
+                } catch (Exception e) {
+                    throw new RuntimeException("Error uploading image: " + fileName, e);
+                }
+            }
+        }
         Auction_Items auction_Items = Auction_ItemsMapper.toAuction_Items(request);
+        auction_Items.setImages(fileNames);
+
 
         Category category = categoryRepository.findById(request.getCategory_id())
                     .orElseThrow(() -> new RuntimeException("Category not found"));
             auction_Items.setCategory(category);
-
-        if (auction_Items.getBid_step() == null) {
-            auction_Items.setBid_step("1");
-        }
-
-        if (auction_Items.getStatus() == null) {
-            auction_Items.setStatus("ACTIVE");
-        }
-
          auction_ItemsRepository.save(auction_Items);
     }
 
-    public void updateAuction_Items(Auction_ItemsRequest request) {
+    public void updateAuction_Items(Auction_ItemsRequest request) throws IOException {
         Auction_Items auction_Items = auction_ItemsRepository.findById(request.getItem_id())
-                .orElseThrow(() -> new RuntimeException("Auction Items are not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_EXISTS));
+
+        if(!Objects.isNull(auction_Items ) && auction_Items.getImages() != null) {
+            for (String image : auction_Items.getImages()) {
+                try{
+                    String publicId = ectractPublucId(image);
+                    cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+
+        List<MultipartFile> images = request.getImages();
+        List<String> fileNames = new ArrayList<>();
+
+        for (MultipartFile image : images) {
+            String fileName = image.getOriginalFilename();
+            if(fileName != null && !fileName.isEmpty()) {
+                try{
+                    Map uploadResult = cloudinary.uploader().upload(image.getBytes(),ObjectUtils.emptyMap());
+                    String fileUrl = uploadResult.get("url").toString();
+
+                    fileNames.add(fileUrl);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+
+            }
+        }
+
+        User user = new User();
+        user.setId(request.getUserId());
+
         if(!Objects.isNull(auction_Items)) {
             auction_Items.setItem_name(request.getItem_name());
             auction_Items.setDescription(request.getDescription());
-            auction_Items.setImages(request.getImages());
+            auction_Items.setImages(fileNames);
             auction_Items.setStarting_price(request.getStarting_price());
             auction_Items.setStart_date(request.getStart_date());
             auction_Items.setEnd_date(request.getEnd_date());
             auction_Items.setBid_step(request.getBid_step());
-            auction_Items.setStatus(request.getStatus());
-        }
+            auction_Items.setUser(user);
 
-            Category category = categoryRepository.findById(request.getCategory_id())
-                    .orElseThrow(() -> new RuntimeException("Category not found"));
-            auction_Items.setCategory(category);
+        }
 
         auction_ItemsRepository.save(auction_Items);
     }
 
     public void deleteAuction_Items (Integer item_id){
+        Auction_Items auction_Items = auction_ItemsRepository.findById(item_id).orElse(null);
+        if(!Objects.isNull(auction_Items)) {
+            List<String> images = auction_Items.getImages();
+
+            for(String image : images) {
+                try{
+                    String publicId = ectractPublucId(image);
+                    cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
         auction_ItemsRepository.deleteById(item_id);
+    }
+
+    private String ectractPublucId(String image) {
+        if(image == null && image.isEmpty()) {
+            throw new IllegalArgumentException("Invalid image URL");
+        }
+
+        String[] parts = image.split("/");
+        String fileName = parts[parts.length - 1];
+
+        return fileName.substring(0, fileName.lastIndexOf("."));
+    }
+
+    public boolean updateStatus(int id) {
+        Auction_Items auction_Items = auction_ItemsRepository.findById(id).orElse(null);
+        if(!Objects.isNull(auction_Items)) {
+            boolean updateStatus = !auction_Items.isStatus();
+            auction_Items.setStatus(updateStatus);
+            auction_ItemsRepository.save(auction_Items);
+            return true;
+        }
+        return false;
     }
 
 }

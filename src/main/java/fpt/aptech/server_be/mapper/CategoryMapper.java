@@ -53,8 +53,8 @@ public class CategoryMapper {
                     auctionItem.getStarting_price(),
                     auctionItem.getStart_date(),
                     auctionItem.getEnd_date(),
-                    auctionItem.getBid_step(),
-                    auctionItem.getStatus()
+                    auctionItem.getBid_step()
+//                    auctionItem.getStatus()
                 )).collect(Collectors.toList());
 
     }

@@ -93,10 +93,4 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
 
-//    @ExceptionHandler(CategoryAlreadyExistsException.class)
-//    public ResponseEntity<ErrorResponse> handleCategoryAlreadyExistsException(CategoryAlreadyExistsException ex) {
-//        ErrorResponse errorResponse = new ErrorResponse(ex.getMessage());
-//        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-//    }
-
 }

@@ -3,6 +3,7 @@ package fpt.aptech.server_be.service;
 import fpt.aptech.server_be.dto.request.UserCreationRequest;
 import fpt.aptech.server_be.dto.request.UserUpdateRequest;
 import fpt.aptech.server_be.dto.response.UserResponse;
+import fpt.aptech.server_be.entities.Auction_Items;
 import fpt.aptech.server_be.entities.User;
 import fpt.aptech.server_be.enums.Role;
 import fpt.aptech.server_be.exception.AppException;
@@ -22,8 +23,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -61,6 +64,7 @@ public class UserService {
 //    @PreAuthorize("hasAuthority('APPROVE_POST')")
     public List<UserResponse> getAllUsers() {
         List<User> users = userRepository.findAll();
+        users.sort(Comparator.comparing(User::getUpdatedAt).reversed());
         return users.stream().map(UserMapper::toUserResponse).collect(Collectors.toList());
     }
 
@@ -100,8 +104,26 @@ public class UserService {
         return userUpdated != null;
     }
 
-    public void deleteUser(String userId) {
-        userRepository.deleteById(userId);
+    public boolean deleteUser(String userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+
+        if(!Objects.isNull(user)){
+            userRepository.delete(user);
+            return true;
+        }
+        return false;
     }
 
+    public boolean updateStatus(String id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        if(!Objects.isNull(user)) {
+            if(user.getIsActive() != null) {
+                boolean updateStatus = !user.getIsActive();
+                user.setIsActive(updateStatus);
+                userRepository.save(user);
+                return true;
+            }
+        }
+        return false;
+    }
 }
