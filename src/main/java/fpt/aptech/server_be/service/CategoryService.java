@@ -20,7 +20,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 
-
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,7 +39,11 @@ public class CategoryService {
 
     public List<CategoryResponse> getAllCategories() {
         List<Category> categories = categoryRepository.findAll();
-        return categories.stream().map(CategoryMapper::toCategoryResponse).collect(Collectors.toList());
+
+        return categories.stream()
+                .sorted(Comparator.comparing(Category::getUpdatedAt).reversed())
+                .map(CategoryMapper::toCategoryResponse)
+                .collect(Collectors.toList());
     }
 
 //    @PreAuthorize("hasRole('ADMIN')")
