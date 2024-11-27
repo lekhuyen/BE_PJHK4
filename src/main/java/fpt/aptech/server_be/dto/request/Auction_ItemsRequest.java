@@ -2,8 +2,10 @@ package fpt.aptech.server_be.dto.request;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -12,15 +14,20 @@ import java.time.LocalDate;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Auction_ItemsRequest {
     int item_id;
-    String userId;
     String item_name;
     String description;
-    String images;
+    List<MultipartFile> images;
     Double starting_price;
     LocalDate start_date;
     LocalDate end_date;
     String bid_step;
-    String status;
+    boolean status;
+    boolean isSell;
+    boolean isSoldout;
+//    double width;
+//    double height;
+
+    String userId;
     int category_id;
 }
 

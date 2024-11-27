@@ -22,18 +22,18 @@ public class Auction_ItemsMapper {
         auctionItems.setUser(user);
         auctionItems.setItem_name(request.getItem_name());
         auctionItems.setDescription(request.getDescription());
-        auctionItems.setImages(request.getImages());
+//        auctionItems.setImages(request.getImages());
         auctionItems.setStarting_price(request.getStarting_price());
         auctionItems.setStart_date(request.getStart_date());
         auctionItems.setEnd_date(request.getEnd_date());
         auctionItems.setBid_step(request.getBid_step());
-        auctionItems.setStatus(request.getStatus());
+//        auctionItems.setStatus(request.getStatus());
     }
 
     // Convert Auction_ItemsRequest to Auction_Items
     public static Auction_Items toAuction_Items(Auction_ItemsRequest request) {
         Auction_Items auctionItems = new Auction_Items();
-        mapCommonFields(request, auctionItems);  // Set common fields
+        mapCommonFields(request, auctionItems);
         return auctionItems;
     }
 
@@ -47,10 +47,13 @@ public class Auction_ItemsMapper {
         response.setDescription(auctionItems.getDescription());
         response.setImages(auctionItems.getImages());
         response.setStarting_price(auctionItems.getStarting_price());
+        response.setCurrent_price(auctionItems.getCurrent_price());
         response.setStart_date(auctionItems.getStart_date());
         response.setEnd_date(auctionItems.getEnd_date());
         response.setBid_step(auctionItems.getBid_step());
-        response.setStatus(auctionItems.getStatus());
+        response.setStatus(auctionItems.isStatus());
+        response.setSell(auctionItems.isSell());
+        response.setSoldout(auctionItems.isSoldout());
         response.setUser(UserMapper.toUserResponse(auctionItems.getUser()));
 //        mapCommonFields(auctionItems, response);
         response.setCategory(toCategoryResponse(auctionItems.getCategory()));
@@ -77,12 +80,12 @@ public class Auction_ItemsMapper {
     private static void mapCommonFields(Auction_Items auctionItems, Auction_ItemsResponse response) {
         response.setItem_name(auctionItems.getItem_name());
         response.setDescription(auctionItems.getDescription());
-        response.setImages(auctionItems.getImages());
+//        response.setImages(auctionItems.getImages());
         response.setStarting_price(auctionItems.getStarting_price());
         response.setStart_date(auctionItems.getStart_date());
         response.setEnd_date(auctionItems.getEnd_date());
         response.setBid_step(auctionItems.getBid_step());
-        response.setStatus(auctionItems.getStatus());
+//        response.setStatus(auctionItems.getStatus());
     }
 }
 

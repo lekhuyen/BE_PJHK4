@@ -60,7 +60,9 @@ public class AuthenticationService {
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         var user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-
+        if (!user.getIsActive()) {
+            throw new AppException(ErrorCode.USER_INACTIVE);
+        }
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
 
         boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
@@ -117,6 +119,7 @@ public class AuthenticationService {
                 //id token
                 .jwtID(UUID.randomUUID().toString())
                 .claim("scope", buildScope(user))
+                .claim("userid", user.getId())
                 .claim("username", user.getName())
                 .build();
 

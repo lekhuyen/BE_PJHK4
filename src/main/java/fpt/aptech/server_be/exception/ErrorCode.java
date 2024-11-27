@@ -19,7 +19,12 @@ public enum ErrorCode {
     UNAUTHENTICATED(1006,"Unauthenticated",HttpStatus.UNAUTHORIZED),
     //k co quyen truy cap
     UNAUTHORIZED(1007,"You do not have permission",HttpStatus.FORBIDDEN),
+
+    //category name exists
     CATEGORY_EXISTS(1008,"Category name already exists",HttpStatus.BAD_REQUEST),
+
+    PRODUCT_NOT_EXISTS(1009,"Product do not existed",HttpStatus.BAD_REQUEST),
+    USER_INACTIVE(1010,"You had been locked",HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(int code, String message,HttpStatusCode statusCode) {

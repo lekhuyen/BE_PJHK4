@@ -55,6 +55,7 @@ public class CategoryController {
     public CategoryResponse getCategoryById(@PathVariable("id") int id) {
         CategoryResponse category = categoryService.getCategoryById(id);
         return ApiResponse.<CategoryResponse>builder()
+                .code(0)
                 .result(category)
                 .build()
                 .getResult();

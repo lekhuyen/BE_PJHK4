@@ -31,6 +31,9 @@ public class User {
     LocalDate dob;
     String ciNumber;
     String address;
+    Boolean isActive = true;
+    LocalDate createdAt = LocalDate.now();
+    LocalDate updatedAt = LocalDate.now();
 
     @ManyToMany
     Set<Role> roles;
