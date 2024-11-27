@@ -6,6 +6,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -34,6 +35,9 @@ public class Auction_Items {
     boolean isSoldout;
     double width = 12.1;
     double height = 12.1;
+
+    Date createdAt = new Date();
+    Date updatedAt = new Date();
 
 
     //who bought it?

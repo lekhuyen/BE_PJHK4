@@ -41,7 +41,11 @@ public class Auction_ItemsService {
 
     public List<Auction_ItemsResponse> getAllAuction_Items() {
         List<Auction_Items> auction_Items = auction_ItemsRepository.findAll();
-        return auction_Items.stream().map(Auction_ItemsMapper::toAuction_ItemsResponse).collect(Collectors.toList());
+//        auction_Items.sort(Comparator.comparing(Auction_Items::getUpdatedAt).reversed());
+        return auction_Items.stream()
+                .sorted(Comparator.comparing(Auction_Items::getUpdatedAt).reversed())
+                .map(Auction_ItemsMapper::toAuction_ItemsResponse)
+                .collect(Collectors.toList());
     }
 
 
