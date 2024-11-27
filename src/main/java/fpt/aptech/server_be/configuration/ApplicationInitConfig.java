@@ -15,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -40,8 +41,8 @@ public class ApplicationInitConfig {
                         .email("admin@gmail.com")
                         .password(passwordEncoder.encode("admin"))
 //                        .roles(roles.add())
-                        .createdAt(LocalDate.now())
-                        .updatedAt(LocalDate.now())
+                        .createdAt(new Date())
+                        .updatedAt(new Date())
                         .isActive(true)
                         .build();
 

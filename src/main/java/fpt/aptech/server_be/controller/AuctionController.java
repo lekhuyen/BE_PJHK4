@@ -4,6 +4,7 @@ package fpt.aptech.server_be.controller;
 import fpt.aptech.server_be.dto.request.ApiResponse;
 import fpt.aptech.server_be.dto.request.Auction_ItemsRequest;
 import fpt.aptech.server_be.dto.response.Auction_ItemsResponse;
+import fpt.aptech.server_be.dto.response.PageResponse;
 import fpt.aptech.server_be.service.Auction_ItemsService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -28,11 +29,20 @@ public class AuctionController {
 
 
     @GetMapping
-    public ApiResponse<List<Auction_ItemsResponse>> getAllAuctions() {
-        return ApiResponse.<List<Auction_ItemsResponse>>builder()
-                .result(auction_ItemsService.getAllAuction_Items())
+    public ApiResponse<PageResponse<Auction_ItemsResponse>> getAllAuctions(
+            @RequestParam(value = "page", required = false,defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false,defaultValue = "2") int size
+    ) {
+        return ApiResponse.<PageResponse<Auction_ItemsResponse>>builder()
+                .result(auction_ItemsService.getAllAuction_Items( page, size))
                 .build();
     }
+//    @GetMapping
+//    public ApiResponse<List<Auction_ItemsResponse>> getAllAuctions() {
+//        return ApiResponse.<List<Auction_ItemsResponse>>builder()
+//                .result(auction_ItemsService.getAllAuction_Items())
+//                .build();
+//    }
 
     @PostMapping(value = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<String> createAuction(@ModelAttribute Auction_ItemsRequest request) {
