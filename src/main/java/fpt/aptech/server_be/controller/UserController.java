@@ -3,6 +3,7 @@ package fpt.aptech.server_be.controller;
 import fpt.aptech.server_be.dto.request.ApiResponse;
 import fpt.aptech.server_be.dto.request.UserCreationRequest;
 import fpt.aptech.server_be.dto.request.UserUpdateRequest;
+import fpt.aptech.server_be.dto.response.PageResponse;
 import fpt.aptech.server_be.dto.response.UserResponse;
 import fpt.aptech.server_be.entities.User;
 import fpt.aptech.server_be.service.OCRService;
@@ -53,7 +54,10 @@ public class UserController {
     }
 
     @GetMapping
-    ApiResponse<List<UserResponse>> getAllUsers() {
+    ApiResponse<PageResponse<UserResponse>> getAllUsers(
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "3") int size
+    ) {
        var authentication = SecurityContextHolder.getContext().getAuthentication();
 
        //log thong tin user
@@ -61,9 +65,9 @@ public class UserController {
         authentication.getAuthorities().forEach(grantedAuthority ->
                 log.info(grantedAuthority.getAuthority()));
 
-        return ApiResponse.<List<UserResponse>>builder()
+        return ApiResponse.<PageResponse<UserResponse>>builder()
                 .code(0)
-                .result(userService.getAllUsers())
+                .result(userService.getAllUsers(page, size))
                 .build();
     }
 
