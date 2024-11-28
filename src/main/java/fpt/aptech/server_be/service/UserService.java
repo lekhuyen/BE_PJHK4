@@ -2,6 +2,7 @@ package fpt.aptech.server_be.service;
 
 import fpt.aptech.server_be.dto.request.UserCreationRequest;
 import fpt.aptech.server_be.dto.request.UserUpdateRequest;
+import fpt.aptech.server_be.dto.response.PageResponse;
 import fpt.aptech.server_be.dto.response.UserResponse;
 import fpt.aptech.server_be.entities.Auction_Items;
 import fpt.aptech.server_be.entities.User;
@@ -16,6 +17,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import net.sourceforge.tess4j.Tesseract;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -62,10 +66,18 @@ public class UserService {
 
 //    @PreAuthorize("hasRole('ADMIN')")
 //    @PreAuthorize("hasAuthority('APPROVE_POST')")
-    public List<UserResponse> getAllUsers() {
-        List<User> users = userRepository.findAll();
-        users.sort(Comparator.comparing(User::getUpdatedAt).reversed());
-        return users.stream().map(UserMapper::toUserResponse).collect(Collectors.toList());
+    public PageResponse<UserResponse> getAllUsers(int page, int size) {
+        Sort sort = Sort.by(Sort.Direction.ASC, "updatedAt");
+        PageRequest pageRequest = PageRequest.of(page - 1, size, sort);
+        Page<User> users = userRepository.findAll(pageRequest);
+//        users.sort(Comparator.comparing(User::getUpdatedAt).reversed());
+        return PageResponse.<UserResponse> builder()
+                .currentPage(page)
+                .pageSize(users.getSize())
+                .totalPages(users.getTotalPages())
+                .totalElements(users.getTotalElements())
+                .data(users.getContent().stream().map(UserMapper::toUserResponse).collect(Collectors.toList()))
+                .build();
     }
 
     //user chi lay dc thong tin cua chinh minh

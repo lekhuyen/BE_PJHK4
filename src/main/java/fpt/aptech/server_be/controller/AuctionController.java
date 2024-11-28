@@ -31,7 +31,7 @@ public class AuctionController {
     @GetMapping
     public ApiResponse<PageResponse<Auction_ItemsResponse>> getAllAuctions(
             @RequestParam(value = "page", required = false,defaultValue = "1") int page,
-            @RequestParam(value = "size", required = false,defaultValue = "2") int size
+            @RequestParam(value = "size", required = false,defaultValue = "3") int size
     ) {
         return ApiResponse.<PageResponse<Auction_ItemsResponse>>builder()
                 .result(auction_ItemsService.getAllAuction_Items( page, size))
