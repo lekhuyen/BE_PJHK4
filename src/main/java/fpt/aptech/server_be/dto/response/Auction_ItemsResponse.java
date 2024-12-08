@@ -5,8 +5,10 @@ import fpt.aptech.server_be.entities.Auction_Items;
 import fpt.aptech.server_be.entities.Category;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -19,12 +21,17 @@ public class Auction_ItemsResponse {
     int item_id;
     String item_name;
     String description;
-    String images;
+    List<String> images;
     Double starting_price;
+    Double current_price;
     LocalDate start_date;
     LocalDate end_date;
     String bid_step;
-    String status;
+    boolean status;
+    boolean isSell;
+    boolean isSoldout;
+//    double width;
+//    double height;
 
     CategoryResponse category;
     UserResponse user;
@@ -33,5 +40,8 @@ public class Auction_ItemsResponse {
     }
 
     public Auction_ItemsResponse(int itemId, String itemName, String description, String images, Double startingPrice, LocalDate startDate, LocalDate endDate, String bidStep, String status) {
+    }
+
+    public Auction_ItemsResponse(int itemId, String itemName, String description, List<String> images, Double startingPrice, LocalDate startDate, LocalDate endDate, String bidStep) {
     }
 }

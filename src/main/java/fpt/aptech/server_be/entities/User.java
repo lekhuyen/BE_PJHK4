@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
 
+import java.util.Date;
 import java.util.List;
 
 import java.util.Set;
@@ -31,6 +32,9 @@ public class User {
     LocalDate dob;
     String ciNumber;
     String address;
+    Boolean isActive = true;
+    Date createdAt = new Date();
+    Date updatedAt = new Date();
 
     @ManyToMany
     Set<Role> roles;

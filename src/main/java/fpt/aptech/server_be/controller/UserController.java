@@ -3,6 +3,7 @@ package fpt.aptech.server_be.controller;
 import fpt.aptech.server_be.dto.request.ApiResponse;
 import fpt.aptech.server_be.dto.request.UserCreationRequest;
 import fpt.aptech.server_be.dto.request.UserUpdateRequest;
+import fpt.aptech.server_be.dto.response.PageResponse;
 import fpt.aptech.server_be.dto.response.UserResponse;
 import fpt.aptech.server_be.entities.User;
 import fpt.aptech.server_be.service.OCRService;
@@ -53,7 +54,10 @@ public class UserController {
     }
 
     @GetMapping
-    List<UserResponse> getAllUsers() {
+    ApiResponse<PageResponse<UserResponse>> getAllUsers(
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "3") int size
+    ) {
        var authentication = SecurityContextHolder.getContext().getAuthentication();
 
        //log thong tin user
@@ -61,7 +65,10 @@ public class UserController {
         authentication.getAuthorities().forEach(grantedAuthority ->
                 log.info(grantedAuthority.getAuthority()));
 
-        return userService.getAllUsers();
+        return ApiResponse.<PageResponse<UserResponse>>builder()
+                .code(0)
+                .result(userService.getAllUsers(page, size))
+                .build();
     }
 
     @GetMapping("/{userId}")
@@ -84,10 +91,28 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
-    String deleteUser(@PathVariable String userId) {
+    public ApiResponse<Boolean> deleteUser(@PathVariable String userId) {
         userService.deleteUser(userId);
 
-        return "User deleted";
+        return ApiResponse.<Boolean>builder()
+                .code(0)
+                .message("User deleted")
+                .build();
+    }
+
+    @PutMapping("/status/{id}")
+    public ApiResponse<Boolean> updateUserStatus(@PathVariable String id) {
+        boolean isUpdate =  userService.updateStatus(id);
+        if(isUpdate) {
+            return ApiResponse.<Boolean> builder()
+                    .code(0)
+                    .message("Update user active successfully")
+                    .build();
+        }
+        return ApiResponse.<Boolean> builder()
+                .code(1)
+                .message("Update user active failed")
+                .build();
     }
 
 }

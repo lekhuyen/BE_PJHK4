@@ -39,6 +39,7 @@ public class UserMapper {
         userResponse.setName(user.getName());
 //        userResponse.setFirstName(user.getFirstName());
 //        userResponse.setLastName(user.getLastName());
+        userResponse.setActive(user.getIsActive() != null ? user.getIsActive() : false);
         userResponse.setDob(user.getDob());
         userResponse.setEmail(user.getEmail());
         userResponse.setCiNumber(user.getCiNumber());

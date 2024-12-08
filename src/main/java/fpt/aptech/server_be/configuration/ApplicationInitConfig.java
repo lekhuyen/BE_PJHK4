@@ -14,7 +14,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Configuration
@@ -36,7 +40,10 @@ public class ApplicationInitConfig {
                 User user = User.builder()
                         .email("admin@gmail.com")
                         .password(passwordEncoder.encode("admin"))
-//                        .roles(roles)
+//                        .roles(roles.add())
+                        .createdAt(new Date())
+                        .updatedAt(new Date())
+                        .isActive(true)
                         .build();
 
                 userRepository.save(user);
@@ -44,4 +51,5 @@ public class ApplicationInitConfig {
             }
         };
     }
+
 }

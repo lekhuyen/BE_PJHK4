@@ -4,6 +4,7 @@ package fpt.aptech.server_be.controller;
 import fpt.aptech.server_be.dto.request.ApiResponse;
 import fpt.aptech.server_be.dto.request.CategoryRequest;
 import fpt.aptech.server_be.dto.response.CategoryResponse;
+import fpt.aptech.server_be.dto.response.PageResponse;
 import fpt.aptech.server_be.exception.CategoryAlreadyExistsException;
 import fpt.aptech.server_be.service.CategoryService;
 import lombok.AccessLevel;
@@ -27,12 +28,12 @@ public class CategoryController {
 
 //    @MessageMapping("/category")
 //    @SendTo("/topic/category")
-    public ApiResponse<List<CategoryResponse>> getAllCategory() {
-        List<CategoryResponse> category = categoryService.getAllCategories();
-        return ApiResponse.<List<CategoryResponse>>builder()
-                .result(category)
-                .build();
-    }
+//    public ApiResponse<List<CategoryResponse>> getAllCategory() {
+//        List<CategoryResponse> category = categoryService.getAllCategories();
+//        return ApiResponse.<List<CategoryResponse>>builder()
+//                .result(category)
+//                .build();
+//    }
 //    @MessageMapping("/category")
 //    @SendTo("/topic/category")
     @PostMapping
@@ -44,9 +45,12 @@ public class CategoryController {
     }
 
     @GetMapping
-    public ApiResponse<List<CategoryResponse>> getCategory() {
-        List<CategoryResponse> category = categoryService.getAllCategories();
-        return ApiResponse.<List<CategoryResponse>>builder()
+    public ApiResponse<PageResponse<CategoryResponse>> getCategory(
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "3") int size
+    ) {
+        PageResponse<CategoryResponse> category = categoryService.getAllCategories(page,size);
+        return ApiResponse.<PageResponse<CategoryResponse>>builder()
                 .result(category)
                 .build();
     }
@@ -55,6 +59,7 @@ public class CategoryController {
     public CategoryResponse getCategoryById(@PathVariable("id") int id) {
         CategoryResponse category = categoryService.getCategoryById(id);
         return ApiResponse.<CategoryResponse>builder()
+                .code(0)
                 .result(category)
                 .build()
                 .getResult();
