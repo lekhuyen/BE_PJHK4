@@ -45,6 +45,18 @@ public class Auction_ItemsService {
     }
 
     public PageResponse<Auction_ItemsResponse> getAllAuction_Items(int page, int size) {
+
+        if (page == 0 && size == 0) {
+            List<Auction_Items> auctionItems = auction_ItemsRepository.findAll(Sort.by("updatedAt").descending());
+            return PageResponse.<Auction_ItemsResponse>builder()
+                    .currentPage(1)
+                    .pageSize(auctionItems.size())
+                    .totalPages(1)
+                    .totalElements(auctionItems.size())
+                    .data(auctionItems.stream().map(Auction_ItemsMapper::toAuction_ItemsResponse).collect(Collectors.toList()))
+                    .build();
+        }
+
 //size => so luong item tren 1 trang
         Sort sort = Sort.by( "updatedAt").descending();
         PageRequest pageable = PageRequest.of(page - 1, size,sort);
