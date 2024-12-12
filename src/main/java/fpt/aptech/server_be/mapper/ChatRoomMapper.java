@@ -9,16 +9,17 @@ import org.mapstruct.Mapper;
 @Mapper
 public class ChatRoomMapper {
     public static ChatRoomResponse toChatRoomResponse(ChatRoom request){
-        return new ChatRoomResponse(
-                request.getId(),
-                request.getSeller().getId(),
-                request.getSeller().getName(),
-                request.getBuyer().getName(),
-                request.getAcAuctionItem().getItem_id(),
-                request.getAcAuctionItem().getItem_name(),
-                request.getAcAuctionItem().getStarting_price(),
-                request.getAcAuctionItem().getCurrent_price(),
-                request.getAcAuctionItem().getImages()
-        );
+        ChatRoomResponse response = new ChatRoomResponse();
+        response.setRoomId(request.getId());
+        response.setUserId(request.getSeller().getId());
+        response.setBuyerName(request.getBuyer().getName());
+        response.setSellerName(request.getSeller().getName());
+        response.setItem_id(request.getAcAuctionItem().getItem_id());
+        response.setItem_name(request.getAcAuctionItem().getItem_name());
+        response.setStarting_price(request.getAcAuctionItem().getStarting_price());
+        response.setCurrent_price(request.getAcAuctionItem().getCurrent_price());
+        response.setImages(request.getAcAuctionItem().getImages());
+
+        return response;
     }
 }
