@@ -69,4 +69,8 @@ public class ChatRoomController {
     public List<ChatMessResponse> getChatContent(@PathVariable int chatRoomId, @PathVariable String buyerId) {
         return chatMessageService.getAllMessagesByBuyerId(chatRoomId,buyerId);
     }
+    @GetMapping("/room/message/{chatRoomId}")
+    public List<ChatMessResponse> getMessageChatOfRoom(@PathVariable int chatRoomId) {
+        return chatMessageService.getMessages(chatRoomId);
+    }
 }
