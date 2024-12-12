@@ -12,8 +12,10 @@ import java.util.List;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ChatRoomResponse {
+    int roomId;
     String userId;
     String buyerName;
+    String sellerName;
     int item_id;
     String item_name;
     Double starting_price;

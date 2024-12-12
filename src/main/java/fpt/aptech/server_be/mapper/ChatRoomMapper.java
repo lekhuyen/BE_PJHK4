@@ -10,8 +10,10 @@ import org.mapstruct.Mapper;
 public class ChatRoomMapper {
     public static ChatRoomResponse toChatRoomResponse(ChatRoom request){
         return new ChatRoomResponse(
+                request.getId(),
                 request.getSeller().getId(),
                 request.getSeller().getName(),
+                request.getBuyer().getName(),
                 request.getAcAuctionItem().getItem_id(),
                 request.getAcAuctionItem().getItem_name(),
                 request.getAcAuctionItem().getStarting_price(),

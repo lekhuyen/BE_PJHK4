@@ -43,11 +43,10 @@ public class ChatRoomService {
         return chatRoom;
     }
 
-    public List<ChatRoomResponse> getAllChatRooms(String buyerId) {
-        User buyer = userRepository.findById(buyerId).orElseThrow(() -> new RuntimeException("User is not found"));
-        List<ChatRoom> chatRooms = chatRoomRepository.findAllChatByBuyer(buyer);
+    public List<ChatRoomResponse> getAllChatRooms(String userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User is not found"));
+        List<ChatRoom> chatRooms = chatRoomRepository.findAllChatByBuyer(user);
 
-        return chatRooms.stream().map(chatRoom ->
-                ChatRoomMapper.toChatRoomResponse(chatRoom)).collect(Collectors.toList());
+        return chatRooms.stream().map(ChatRoomMapper::toChatRoomResponse).collect(Collectors.toList());
     }
 }

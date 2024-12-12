@@ -31,8 +31,14 @@ public class ChatMessageService {
     UserRepository userRepository;
     ChatRoomRepository chatRoomRepository;
 
-    public List<ChatMessage> getMessages(ChatRoom chatRoom) {
-        return chatMessageRepository.findByChatRoomOrderByTimestampAsc(chatRoom);
+//    public List<ChatMessage> getMessages(ChatRoom chatRoom) {
+//        return chatMessageRepository.findByChatRoomOrderByTimestampAsc(chatRoom);
+//    }
+    public List<ChatMessResponse> getMessages(int chatRoom) {
+        ChatRoom chatRoom1 = chatRoomRepository.findById(chatRoom).get();
+        List<ChatMessage> chatMessages = chatMessageRepository.findByChatRoomOrderByTimestampAsc(chatRoom1);
+
+        return chatMessages.stream().map(ChatMessageMapper::toChatMessageResponse).collect(Collectors.toList());
     }
 
     public String sendMessage(ChatRoom chatRoom, String sender, String content) throws JsonProcessingException {
