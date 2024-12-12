@@ -38,7 +38,7 @@ public class ChatRoomController {
     private final SimpMessagingTemplate messagingTemplate;
 
     @PostMapping("/room/{productId}")
-    public ChatRoom createOrJoinRoom(@PathVariable int productId,
+    public ChatRoomResponse createOrJoinRoom(@PathVariable int productId,
                                      @RequestBody Map<String, String> requestBody) {
         String buyerId = requestBody.get("buyerId");
         if (buyerId == null) {

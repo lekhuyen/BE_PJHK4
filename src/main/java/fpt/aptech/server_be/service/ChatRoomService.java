@@ -27,7 +27,7 @@ public class ChatRoomService {
     Auction_ItemsRepository auctionItemsRepository;
     UserRepository userRepository;
 
-    public ChatRoom createOrChatRoom(int auctionItemId, User buyer) {
+    public ChatRoomResponse createOrChatRoom(int auctionItemId, User buyer) {
         Auction_Items auction_Item = auctionItemsRepository.findById(auctionItemId)
                 .orElseThrow(() -> new RuntimeException("Auction Items are not found"));
         ChatRoom chatRoom = chatRoomRepository.findByAcAuctionItemAndBuyerAndSeller(auction_Item, buyer,auction_Item.getUser());
@@ -37,10 +37,10 @@ public class ChatRoomService {
             chatRoom.setAcAuctionItem(auction_Item);
             chatRoom.setBuyer(buyer);
             chatRoom.setSeller(auction_Item.getUser());
-            return chatRoomRepository.save(chatRoom);
+             chatRoomRepository.save(chatRoom);
+        return ChatRoomMapper.toChatRoomResponse(chatRoom);
         }
-
-        return chatRoom;
+        return null;
     }
 
     public List<ChatRoomResponse> getAllChatRooms(String userId) {
