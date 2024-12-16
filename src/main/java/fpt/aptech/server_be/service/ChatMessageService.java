@@ -1,5 +1,7 @@
 package fpt.aptech.server_be.service;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fpt.aptech.server_be.dto.response.ChatMessResponse;
@@ -17,9 +19,9 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -30,6 +32,7 @@ public class ChatMessageService {
     ChatMessageRepository chatMessageRepository;
     UserRepository userRepository;
     ChatRoomRepository chatRoomRepository;
+    Cloudinary cloudinary;
 
 //    public List<ChatMessage> getMessages(ChatRoom chatRoom) {
 //        return chatMessageRepository.findByChatRoomOrderByTimestampAsc(chatRoom);
@@ -41,9 +44,24 @@ public class ChatMessageService {
         return chatMessages.stream().map(ChatMessageMapper::toChatMessageResponse).collect(Collectors.toList());
     }
 
-    public String sendMessage(ChatRoom chatRoom, String sender, String content) throws JsonProcessingException {
+    public String sendMessage(ChatRoom chatRoom, String sender, String content,List<String> images) throws JsonProcessingException {
         ObjectMapper om = new ObjectMapper();
         om.registerModule(new JavaTimeModule());
+
+        List<String> fileNames = new ArrayList<>();
+        for (String image : images) {
+            if(image != null && !image.isEmpty()) {
+                byte[] fileName = Base64.getDecoder().decode(image);
+                try {
+                    Map uploadResult = cloudinary.uploader().upload(fileName, ObjectUtils.emptyMap());
+                    String fileUrl = uploadResult.get("url").toString();
+                    fileNames.add(fileUrl);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+        }
 
         User user = new User();
         user.setId(sender);
@@ -53,16 +71,18 @@ public class ChatMessageService {
         message.setSender(user);
         message.setContent(content);
         message.setTimestamp(new Date());
+        message.setImages(fileNames);
 
 
         chatMessageRepository.save(message);
 
         ChatMessResponse chatMessResponse = new ChatMessResponse();
         chatMessResponse.setId(message.getId());
-        chatMessResponse.setChatRoomId(message.getChatRoom().getId());
+        chatMessResponse.setRoomId(message.getChatRoom().getId());
         chatMessResponse.setSenderId(message.getSender().getId());
         chatMessResponse.setTimestamp(message.getTimestamp());
         chatMessResponse.setContent(message.getContent());
+        chatMessResponse.setImages(message.getImages());
 
         return om.writeValueAsString(chatMessResponse);
     }
@@ -76,4 +96,14 @@ public class ChatMessageService {
                 .map(ChatMessageMapper::toChatMessageResponse)
                 .collect(Collectors.toList());
     }
+    public List<ChatMessResponse> getAllMessagesByUserId(String userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        List<ChatMessage> chatMessages = chatMessageRepository.findChatMessageBySender(user);
+
+        return chatMessages.stream()
+                .map(ChatMessageMapper::toChatMessageResponse)
+                .collect(Collectors.toList());
+    }
+
+
 }

@@ -21,4 +21,5 @@ public class ChatRoomResponse {
     Double starting_price;
     Double current_price;
     List<String> images;
+    ChatMessResponse message;
 }

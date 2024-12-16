@@ -14,7 +14,8 @@ public class ChatMessageMapper {
                 request.getContent(),
                 request.getChatRoom().getId(),
                 request.getSender().getId(),
-                request.getTimestamp()
+                request.getTimestamp(),
+                request.getImages()
         );
     }
 }

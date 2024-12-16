@@ -42,6 +42,17 @@ public class CategoryService {
     }
 
     public PageResponse<CategoryResponse> getAllCategories(int page, int size) {
+
+        if (page == 0 && size == 0){
+            List<Category> allCategories = categoryRepository.findAll();
+            return PageResponse.<CategoryResponse>builder()
+                    .currentPage(1)
+                    .pageSize(allCategories.size())
+                    .totalElements(allCategories.size())
+                    .totalPages(1)
+                    .data(allCategories.stream().map(CategoryMapper::toCategoryResponse).collect(Collectors.toList()))
+                    .build();
+        }
         Sort sort = Sort.by(Sort.Direction.ASC, "updatedAt");
         PageRequest pageResponse = PageRequest.of(page - 1, size,sort);
         Page<Category> categories = categoryRepository.findAll(pageResponse);

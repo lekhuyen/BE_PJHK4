@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Getter
@@ -27,6 +28,9 @@ public class ChatRoom {
     @ManyToOne
     @JoinColumn(name = "buyer_id", nullable = false)
     private User buyer;
+
+    @OneToMany(mappedBy = "chatRoom")
+    private List<ChatMessage> message;
 
     @ManyToOne
     @JoinColumn(name = "seller_id", nullable = false)
