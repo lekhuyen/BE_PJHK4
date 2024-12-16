@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Getter
@@ -21,9 +22,14 @@ public class ChatMessage {
 
      String content;
 
+    @ElementCollection
+    @CollectionTable(name = "chat_images", joinColumns = @JoinColumn(name = "images_id"))
+    @Column(name = "images_name")
+     List<String> images;
+
     @ManyToOne
     @JoinColumn(name = "chat_room_id", nullable = false)
-     ChatRoom chatRoom;
+    ChatRoom chatRoom;
 
     @ManyToOne
     @JoinColumn(name = "sender_id", nullable = false)

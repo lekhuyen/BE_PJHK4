@@ -1,10 +1,11 @@
 package fpt.aptech.server_be.mapper;
 
 import fpt.aptech.server_be.dto.response.ChatRoomResponse;
-import fpt.aptech.server_be.dto.response.UserResponse;
+import fpt.aptech.server_be.entities.ChatMessage;
 import fpt.aptech.server_be.entities.ChatRoom;
-import fpt.aptech.server_be.entities.User;
 import org.mapstruct.Mapper;
+
+import java.util.stream.Collectors;
 
 @Mapper
 public class ChatRoomMapper {
@@ -19,7 +20,10 @@ public class ChatRoomMapper {
         response.setStarting_price(request.getAcAuctionItem().getStarting_price());
         response.setCurrent_price(request.getAcAuctionItem().getCurrent_price());
         response.setImages(request.getAcAuctionItem().getImages());
-
+        ChatMessage message = request.getMessage().stream().reduce((first,second)-> second).orElse(null);
+        if (message != null) {
+            response.setMessage(ChatMessageMapper.toChatMessageResponse(message));
+        }
         return response;
     }
 }

@@ -2,6 +2,7 @@ package fpt.aptech.server_be.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -16,6 +17,7 @@ import org.springframework.security.web.reactive.result.method.annotation.Authen
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import org.springframework.web.socket.server.standard.ServerEndpointExporter;
 
 import java.util.List;
 
@@ -27,6 +29,7 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.enableSimpleBroker("/topic/", "/queue/");
+//                .setHeartbeatValue(new long[] {10000, 10000});
         registry.setApplicationDestinationPrefixes("/app");
     }
 
@@ -39,11 +42,6 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
                 .withSockJS();
     }
 
-//    @Override
-//    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
-//        argumentResolvers.add(new AuthenticationPrincipalArgumentResolver());
-//    }
-
     @Override
     public boolean configureMessageConverters(List<MessageConverter> messageConverters) {
         DefaultContentTypeResolver resolver = new DefaultContentTypeResolver();
@@ -54,5 +52,9 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
 
         messageConverters.add(converter);
         return false;
+    }
+    @Bean
+    public ServerEndpointExporter serverEndpointExporter() {
+        return new ServerEndpointExporter();
     }
 }

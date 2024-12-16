@@ -17,13 +17,18 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.mutable.Mutable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -50,15 +55,35 @@ public class ChatRoomController {
     }
 
 //    @MessageMapping("/sendMessage/{roomId}")  // Client gửi tới /app/sendMessage/{roomId}
-    @MessageMapping("/sendMessage")  // Client gửi tới /app/sendMessage/{roomId}
+    // Client gửi tới /app/sendMessage/{roomId}
 //    @SendTo("/topic/room/{roomId}")  // Tin nhắn được gửi tới /topic/room/{roomId}
-    public void sendMessage(@RequestBody ChatMessageRequest messageRequest) throws JsonProcessingException {
-        ChatRoom chatRoom = chatRoomRepository.findById(messageRequest.getRoomId())
-                .orElseThrow(() -> new RuntimeException("Chat room not found"));
-        String message = chatMessageService.sendMessage(chatRoom, messageRequest.getSender(), messageRequest.getContent());
+@MessageMapping("/sendMessage")
+public void sendMessage(@RequestPart ChatMessageRequest messageRequest) throws JsonProcessingException {
+    ChatRoom chatRoom = chatRoomRepository.findById(messageRequest.getRoomId())
+            .orElseThrow(() -> new RuntimeException("Chat room not found"));
 
-        messagingTemplate.convertAndSend("/topic/room/" + messageRequest.getRoomId(), message); // Tin nhắn được gửi tới /topic/room/{roomId}
+    if (messageRequest.getImages() != null) {
+        List<String> base64Images = messageRequest.getImages().stream()
+                .map(file -> {
+                    byte[] bytes = Base64.getEncoder().encode(file.getBytes());
+                    return new String(bytes);
+                })
+                .collect(Collectors.toList());
+
+        messageRequest.setImages(base64Images);
     }
+
+    String message = chatMessageService.sendMessage(
+            chatRoom,
+            messageRequest.getSender(),
+            messageRequest.getContent(),
+            messageRequest.getImages()
+    );
+
+    messagingTemplate.convertAndSend("/topic/room/" + messageRequest.getRoomId(), message);
+}
+
+
 
     @GetMapping("/room/{buyerId}")
     public List<ChatRoomResponse> getRoom(@PathVariable String buyerId) {
@@ -72,5 +97,9 @@ public class ChatRoomController {
     @GetMapping("/room/message/{chatRoomId}")
     public List<ChatMessResponse> getMessageChatOfRoom(@PathVariable int chatRoomId) {
         return chatMessageService.getMessages(chatRoomId);
+    }
+    @GetMapping("/room/message/room/{userId}")
+    public List<ChatMessResponse> getMessageChatByUser(@PathVariable String userId) {
+        return chatMessageService.getAllMessagesByUserId(userId);
     }
 }
