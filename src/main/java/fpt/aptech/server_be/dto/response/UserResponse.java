@@ -26,6 +26,4 @@ public class UserResponse {
     boolean isActive;
     Set<RoleResponse> roles;
 
-    public UserResponse(User userUpdated) {
-    }
 }

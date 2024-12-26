@@ -46,6 +46,7 @@ public class SecurityConfig {
     private final String[] PUBLIC_ENDPOINTS_GET = {
             "/api/users/**",
             "/api/auction/**",
+            "/api/bidding/**",
     };
     private final String[] PUBLIC_ENDPOINTS_DELETE = {
             "/api/users/**",
@@ -73,6 +74,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, PUBLIC_ENDPOINTS_DELETE).permitAll()
                         .requestMatchers(HttpMethod.PUT, PUBLIC_ENDPOINTS_PUT).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/category/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/bidding/**").permitAll()
 
                         .requestMatchers("/ws/**").permitAll()
 

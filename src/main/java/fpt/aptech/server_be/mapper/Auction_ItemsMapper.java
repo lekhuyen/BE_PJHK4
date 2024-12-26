@@ -58,6 +58,12 @@ public class Auction_ItemsMapper {
 //        mapCommonFields(auctionItems, response);
         response.setCategory(toCategoryResponse(auctionItems.getCategory()));
 
+        response.setBidding(
+                auctionItems.getBidding() != null
+                        ? BiddingMapper.toBiddingResponse(auctionItems.getBidding())
+                        : null
+        );
+
         return response;
     }
 
