@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -36,10 +37,24 @@ public class User {
     Date createdAt = new Date();
     Date updatedAt = new Date();
 
+//    @OneToOne(mappedBy = "user")
+//    Bidding bidding;
+
+
+    @OneToMany(mappedBy = "user")
+    List<Bidding> biddings;
+
     @ManyToMany
     Set<Role> roles;
 
 // One-to-many relationship with Auction_Items
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     List<Auction_Items> auctionItems;
+
+    @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL)
+    List<Notification> sellerNotifications; // Notifications where the user is the seller
+
+    @OneToMany(mappedBy = "buyer", cascade = CascadeType.ALL)
+    List<Notification> buyerNotifications;  // Notifications where the user is the buyer
+
 }

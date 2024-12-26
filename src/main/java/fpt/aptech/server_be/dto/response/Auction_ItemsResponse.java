@@ -36,11 +36,7 @@ public class Auction_ItemsResponse {
     CategoryResponse category;
     UserResponse user;
 
-    public Auction_ItemsResponse(Auction_Items auctionItems) {
-    }
-
-    public Auction_ItemsResponse(int itemId, String itemName, String description, String images, Double startingPrice, LocalDate startDate, LocalDate endDate, String bidStep, String status) {
-    }
+    BiddingResponse bidding;
 
     public Auction_ItemsResponse(int itemId, String itemName, String description, List<String> images, Double startingPrice, LocalDate startDate, LocalDate endDate, String bidStep) {
     }
