@@ -20,10 +20,23 @@ spring:
       max-request-size: 20MB
   jackson:
     date-format:yyyy-MM-dd:
+  mail:
+    host: smtp.gmail.com
+    username: khuyenle541@gmail.com
+    password: qzjgbglxidzmzibn
+    port: 587
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 jwt:
   signerKey: "pDozQy8Ihk/phzNwDBNzRmuWvnA6YkDg/D1mmO4FpejrQJ3kVTf10AcELK1qJnGW"
   valid-duration: 3600 #second
   refreshtable-duration: 360000
+
+
 
 
