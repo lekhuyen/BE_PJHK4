@@ -43,6 +43,13 @@ public class Auction_ItemsService {
         Auction_Items auction_Items = auction_ItemsRepository.findById(item_id).orElseThrow(() -> new RuntimeException("Auction Items are not found"));
         return Auction_ItemsMapper.toAuction_ItemsResponse(auction_Items);
     }
+//update isSell
+    public boolean updateIsSell(Integer item_id) {
+        Auction_Items auction_Items = auction_ItemsRepository.findById(item_id).orElseThrow(() -> new RuntimeException("Auction Items are not found"));
+        auction_Items.setSell(true);
+        auction_ItemsRepository.save(auction_Items) ;
+        return true;
+    }
 
     public PageResponse<Auction_ItemsResponse> getAllAuction_Items(int page, int size) {
 

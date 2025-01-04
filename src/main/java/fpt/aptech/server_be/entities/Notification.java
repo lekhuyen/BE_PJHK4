@@ -36,4 +36,6 @@ public class Notification {
     User buyer;
 
     Date date = new Date();
+
+    boolean auction = false;
 }

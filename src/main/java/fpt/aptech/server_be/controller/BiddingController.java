@@ -85,4 +85,9 @@ public class BiddingController {
                 .build();
     }
 
+    @PostMapping("success/{productId}/{sellerId}")
+    public boolean auctionSuccess(@PathVariable("productId") int productId,@PathVariable("sellerId") String sellerId){
+        return biddingService.auctionSuccess(productId,sellerId);
+    }
+
 }

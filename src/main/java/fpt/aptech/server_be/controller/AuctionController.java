@@ -94,4 +94,9 @@ public class AuctionController {
                 .message("Update auction item failed")
                 .build();
     }
+
+    @PutMapping("issell/{id}")
+    public Boolean updateAuctionIsSell(@PathVariable int id) {
+        return auction_ItemsService.updateIsSell(id);
+    }
 }

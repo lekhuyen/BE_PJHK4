@@ -22,6 +22,7 @@ public class NotificationMapper {
                 .sellerId(request.getSeller().getId())
                 .sellerName(request.getSeller().getName())
                 .timestamp(request.getDate())
+                .auction(request.isAuction())
                 .build();
     }
 }

@@ -30,4 +30,5 @@ public class NotificationResponse {
     String buyerName;
 
     Date timestamp;
+    boolean auction;
 }
