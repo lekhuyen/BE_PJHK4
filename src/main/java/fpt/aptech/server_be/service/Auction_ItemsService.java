@@ -88,6 +88,41 @@ public class Auction_ItemsService {
                 .build();
     }
 
+    //get product by category
+    public PageResponse<Auction_ItemsResponse> getAuctionItemByCategory(int category_id, Integer page, Integer size) {
+        Category category = categoryRepository.findById(category_id)
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+
+        if (page == null || size == null || (page == 0 && size == 0)) {
+            List<Auction_Items> auctionItems = auction_ItemsRepository.getAuction_ItemsByCategory(category);
+            auctionItems.sort((item1, item2) -> item2.getUpdatedAt().compareTo(item1.getUpdatedAt()));
+            return PageResponse.<Auction_ItemsResponse>builder()
+                    .currentPage(1)
+                    .pageSize(auctionItems.size())
+                    .totalPages(1)
+                    .totalElements(auctionItems.size())
+                    .data(auctionItems.stream()
+                            .map(Auction_ItemsMapper::toAuction_ItemsResponse)
+                            .collect(Collectors.toList()))
+                    .build();
+        }
+
+        PageRequest pageable = PageRequest.of(page - 1, size, Sort.by("updatedAt").descending());
+        Page<Auction_Items> auctionItemsPage = auction_ItemsRepository.findByCategory(category, pageable);
+
+        return PageResponse.<Auction_ItemsResponse>builder()
+                .currentPage(page)
+                .pageSize(auctionItemsPage.getSize())
+                .totalPages(auctionItemsPage.getTotalPages())
+                .totalElements(auctionItemsPage.getTotalElements())
+                .data(auctionItemsPage.getContent().stream()
+                        .map(Auction_ItemsMapper::toAuction_ItemsResponse)
+                        .collect(Collectors.toList()))
+                .build();
+    }
+
+
+
 
     public void addAuction_Items(Auction_ItemsRequest request) {
 
