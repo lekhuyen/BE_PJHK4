@@ -39,6 +39,8 @@ public class Auction_ItemsService {
     Auction_ItemsRepository auction_ItemsRepository;
     private final CategoryRepository categoryRepository;
 
+
+
     public Auction_ItemsResponse getAuction_ItemsById(Integer item_id) {
         Auction_Items auction_Items = auction_ItemsRepository.findById(item_id).orElseThrow(() -> new RuntimeException("Auction Items are not found"));
         return Auction_ItemsMapper.toAuction_ItemsResponse(auction_Items);
@@ -51,7 +53,53 @@ public class Auction_ItemsService {
         return true;
     }
 
-    public PageResponse<Auction_ItemsResponse> getAllAuction_Items(int page, int size) {
+    public PageResponse<Auction_ItemsResponse> getAllAuction_Items(int page, int size, String name) {
+
+        if (page == 0 && size == 0) {
+            Page<Auction_Items> auctionItems = null;
+
+            if (name != null && !name.isEmpty()) {
+                PageRequest pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by("updatedAt").descending());
+                auctionItems = auction_ItemsRepository.findAllByItem_name(name, pageable);
+            }
+            else {
+                PageRequest pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by("updatedAt").descending());
+                auctionItems = auction_ItemsRepository.findAll(pageable);
+            }
+
+            return PageResponse.<Auction_ItemsResponse>builder()
+                    .currentPage(1)
+                    .pageSize(auctionItems.getSize())
+                    .totalPages(1)
+                    .totalElements(auctionItems.getSize())
+                    .data(auctionItems.stream().map(Auction_ItemsMapper::toAuction_ItemsResponse).collect(Collectors.toList()))
+                    .build();
+        }
+
+        // Phân trang với sort
+        Sort sort = Sort.by("updatedAt").descending();
+        PageRequest pageable = PageRequest.of(page - 1, size, sort);
+
+        Page<Auction_Items> auctionItemsPage;
+
+        //co name
+        if (name != null && !name.isEmpty()) {
+            auctionItemsPage = auction_ItemsRepository.findAllByItem_name(name, pageable);
+        } else {
+            auctionItemsPage = auction_ItemsRepository.findAll(pageable);
+        }
+
+        return PageResponse.<Auction_ItemsResponse>builder()
+                .currentPage(page)
+                .pageSize(auctionItemsPage.getSize())
+                .totalPages(auctionItemsPage.getTotalPages())
+                .totalElements(auctionItemsPage.getTotalElements())
+                .data(auctionItemsPage.getContent().stream().map(Auction_ItemsMapper::toAuction_ItemsResponse).collect(Collectors.toList()))
+                .build();
+    }
+
+//=============================================================================== k dc xoa
+    public PageResponse<Auction_ItemsResponse> getAllAuction_Itemsssss(int page, int size) {
 
         if (page == 0 && size == 0) {
             List<Auction_Items> auctionItems = auction_ItemsRepository.findAll(Sort.by("updatedAt").descending());
@@ -244,4 +292,12 @@ public class Auction_ItemsService {
         return false;
     }
 
+
+    public List<Auction_ItemsResponse> getAuctionsOnHome(){
+        PageRequest pageable = PageRequest.of(0, 10, Sort.by(Sort.Order.desc("updatedAt")));
+        Page<Auction_Items> auctionItemsPage = auction_ItemsRepository.findAll(pageable);
+        return auctionItemsPage.stream()
+                .map(Auction_ItemsMapper::toAuction_ItemsResponse)
+                .collect(Collectors.toList());
+    }
 }

@@ -14,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.List;
 
 
 @Slf4j
@@ -30,10 +31,11 @@ public class AuctionController {
     @GetMapping
     public ApiResponse<PageResponse<Auction_ItemsResponse>> getAllAuctions(
             @RequestParam(value = "page", required = false,defaultValue = "1") int page,
-            @RequestParam(value = "size", required = false,defaultValue = "3") int size
+            @RequestParam(value = "size", required = false,defaultValue = "3") int size,
+            @RequestParam(value = "name", required = false) String name
     ) {
         return ApiResponse.<PageResponse<Auction_ItemsResponse>>builder()
-                .result(auction_ItemsService.getAllAuction_Items( page, size))
+                .result(auction_ItemsService.getAllAuction_Items( page, size,name))
                 .build();
     }
 
@@ -107,5 +109,14 @@ public class AuctionController {
     @PutMapping("issell/{id}")
     public Boolean updateAuctionIsSell(@PathVariable int id) {
         return auction_ItemsService.updateIsSell(id);
+    }
+
+    @GetMapping("get-onhome")
+    public ApiResponse<List<Auction_ItemsResponse>> getAuctionOnHome() {
+        List<Auction_ItemsResponse> list = auction_ItemsService.getAuctionsOnHome();
+
+        return ApiResponse.<List<Auction_ItemsResponse>>builder()
+                .result(list)
+                .build();
     }
 }
