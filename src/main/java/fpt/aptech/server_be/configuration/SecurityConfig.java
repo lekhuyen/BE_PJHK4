@@ -75,6 +75,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, PUBLIC_ENDPOINTS_PUT).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/category/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/bidding/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/auction/category/**").permitAll()
+
 
                         .requestMatchers("/ws/**").permitAll()
 

@@ -12,10 +12,9 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
+
 
 @Slf4j
 @RestController
@@ -35,6 +34,16 @@ public class AuctionController {
     ) {
         return ApiResponse.<PageResponse<Auction_ItemsResponse>>builder()
                 .result(auction_ItemsService.getAllAuction_Items( page, size))
+                .build();
+    }
+
+    @GetMapping("category/{id}")
+    public ApiResponse<PageResponse<Auction_ItemsResponse>> getAuctionByCategory(@PathVariable int id,
+                                 @RequestParam(value = "page", required = false,defaultValue = "1") int page,
+                                  @RequestParam(value = "size", required = false,defaultValue = "3") int size) {
+        PageResponse<Auction_ItemsResponse> response = auction_ItemsService.getAuctionItemByCategory(id, page, size);
+        return ApiResponse.<PageResponse<Auction_ItemsResponse>> builder()
+                .result(response)
                 .build();
     }
 //    @GetMapping
