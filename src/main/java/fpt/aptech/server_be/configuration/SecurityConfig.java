@@ -13,9 +13,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
@@ -41,7 +38,6 @@ public class SecurityConfig {
             "/api/auth/refresh",
             "/api/users/addImage/**",   // File upload
             "/api/auction/**",
-
     };
 
     private final String[] PUBLIC_ENDPOINTS_GET = {
@@ -77,9 +73,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/category/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/bidding/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/auction/category/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/contact").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/contact/**").permitAll()
-                        .requestMatchers(HttpMethod.PUT, "/api/contact/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/auction/get-onhome").permitAll()
 
 
                         .requestMatchers("/ws/**").permitAll()
