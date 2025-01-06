@@ -41,6 +41,7 @@ public class SecurityConfig {
             "/api/auth/refresh",
             "/api/users/addImage/**",   // File upload
             "/api/auction/**",
+
     };
 
     private final String[] PUBLIC_ENDPOINTS_GET = {
@@ -76,6 +77,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/category/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/bidding/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/auction/category/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/contact").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/contact/**").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/contact/**").permitAll()
 
 
                         .requestMatchers("/ws/**").permitAll()
