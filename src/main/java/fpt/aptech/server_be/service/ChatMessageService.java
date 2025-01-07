@@ -43,8 +43,102 @@ public class ChatMessageService {
 
         return chatMessages.stream().map(ChatMessageMapper::toChatMessageResponse).collect(Collectors.toList());
     }
+//send message
+//    public String sendMessage(ChatRoom chatRoom, String sender, String content,List<String> images) throws JsonProcessingException {
+//        ObjectMapper om = new ObjectMapper();
+//        om.registerModule(new JavaTimeModule());
+//
+//        List<String> fileNames = new ArrayList<>();
+//        for (String image : images) {
+//            if(image != null && !image.isEmpty()) {
+//                byte[] fileName = Base64.getDecoder().decode(image);
+//                try {
+//                    Map uploadResult = cloudinary.uploader().upload(fileName, ObjectUtils.emptyMap());
+//                    String fileUrl = uploadResult.get("url").toString();
+//                    fileNames.add(fileUrl);
+//                } catch (Exception e) {
+//                    throw new RuntimeException(e);
+//                }
+//            }
+//
+//        }
+//
+//        User user = new User();
+//        user.setId(sender);
+//
+//        ChatMessage message = new ChatMessage();
+//        message.setChatRoom(chatRoom);
+//        message.setSender(user);
+//        message.setContent(content);
+//        message.setTimestamp(new Date());
+//        message.setImages(fileNames);
+//
+//
+//        chatMessageRepository.save(message);
+//
+//        ChatMessResponse chatMessResponse = new ChatMessResponse();
+//        chatMessResponse.setId(message.getId());
+//        chatMessResponse.setRoomId(message.getChatRoom().getId());
+//        chatMessResponse.setSenderId(message.getSender().getId());
+//        chatMessResponse.setTimestamp(message.getTimestamp());
+//        chatMessResponse.setContent(message.getContent());
+//        chatMessResponse.setImages(message.getImages());
+//
+//        return om.writeValueAsString(chatMessResponse);
+//    }
 
-    public String sendMessage(ChatRoom chatRoom, String sender, String content,List<String> images) throws JsonProcessingException {
+
+    public ChatMessResponse sendMessage(ChatRoom chatRoom, String sender, String content,List<MultipartFile> images) throws JsonProcessingException {
+//        ObjectMapper om = new ObjectMapper();
+//        om.registerModule(new JavaTimeModule());
+
+        List<String> fileNames = new ArrayList<>();
+        if(images != null) {
+            for (MultipartFile image : images) {
+                String fileName = image.getOriginalFilename();
+
+                if(fileName != null && !fileName.isEmpty()) {
+                    try {
+                        Map uploadResult = cloudinary.uploader().upload(image.getBytes(), ObjectUtils.emptyMap());
+                        String fileUrl = uploadResult.get("url").toString();
+
+                        fileNames.add(fileUrl);
+                    } catch (Exception e) {
+                        throw new RuntimeException("Error uploading image: " + fileName, e);
+                    }
+                }
+            }
+        }
+
+
+        User user = new User();
+        user.setId(sender);
+
+        ChatMessage message = new ChatMessage();
+        message.setChatRoom(chatRoom);
+        message.setSender(user);
+        message.setContent(content);
+        message.setTimestamp(new Date());
+        message.setImages(fileNames);
+
+
+        chatMessageRepository.save(message);
+
+        ChatMessResponse chatMessResponse = new ChatMessResponse();
+        chatMessResponse.setId(message.getId());
+        chatMessResponse.setRoomId(message.getChatRoom().getId());
+        chatMessResponse.setSenderId(message.getSender().getId());
+        chatMessResponse.setTimestamp(message.getTimestamp());
+        chatMessResponse.setContent(message.getContent());
+        chatMessResponse.setImages(message.getImages() != null ? message.getImages() : null);
+
+//        return om.writeValueAsString(chatMessResponse);
+        return chatMessResponse;
+    }
+
+
+    //gui tin co image
+    public String sendMessageImage(ChatRoom chatRoom, String sender,List<String> images) throws JsonProcessingException {
         ObjectMapper om = new ObjectMapper();
         om.registerModule(new JavaTimeModule());
 
@@ -69,7 +163,7 @@ public class ChatMessageService {
         ChatMessage message = new ChatMessage();
         message.setChatRoom(chatRoom);
         message.setSender(user);
-        message.setContent(content);
+
         message.setTimestamp(new Date());
         message.setImages(fileNames);
 
@@ -86,6 +180,8 @@ public class ChatMessageService {
 
         return om.writeValueAsString(chatMessResponse);
     }
+
+
 
     public List<ChatMessResponse> getAllMessagesByBuyerId(int chatRoomId,String buyerId) {
         User user = userRepository.findById(buyerId).orElse(null);
