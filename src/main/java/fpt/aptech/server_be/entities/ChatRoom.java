@@ -25,7 +25,7 @@ public class ChatRoom {
     @JoinColumn(name = "product_id", nullable = false)
     private Auction_Items acAuctionItem;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "buyer_id", nullable = false)
     private User buyer;
 

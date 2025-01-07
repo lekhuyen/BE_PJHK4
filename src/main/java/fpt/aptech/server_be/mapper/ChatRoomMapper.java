@@ -20,9 +20,16 @@ public class ChatRoomMapper {
         response.setStarting_price(request.getAcAuctionItem().getStarting_price());
         response.setCurrent_price(request.getAcAuctionItem().getCurrent_price());
         response.setImages(request.getAcAuctionItem().getImages());
-        ChatMessage message = request.getMessage().stream().reduce((first,second)-> second).orElse(null);
-        if (message != null) {
-            response.setMessage(ChatMessageMapper.toChatMessageResponse(message));
+
+
+        if (request.getMessage() != null && !request.getMessage().isEmpty()) {
+            ChatMessage message = request.getMessage()
+                    .stream()
+                    .reduce((first, second) -> second)
+                    .orElse(null);
+            if (message != null) {
+                response.setMessage(ChatMessageMapper.toChatMessageResponse(message));
+            }
         }
         return response;
     }
