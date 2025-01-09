@@ -8,6 +8,7 @@ import fpt.aptech.server_be.dto.response.ChatMessageResponse;
 import fpt.aptech.server_be.dto.response.ChatRoomResponse;
 import fpt.aptech.server_be.entities.ChatMessage;
 import fpt.aptech.server_be.entities.ChatRoom;
+import fpt.aptech.server_be.entities.TypingStatus;
 import fpt.aptech.server_be.entities.User;
 import fpt.aptech.server_be.repositories.ChatRoomRepository;
 import fpt.aptech.server_be.repositories.UserRepository;
@@ -20,6 +21,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.springframework.http.MediaType;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -140,5 +142,17 @@ public ChatMessResponse sendMessages(@ModelAttribute ChatMessageRequest messageR
     @GetMapping("/room/message/room/{userId}")
     public List<ChatMessResponse> getMessageChatByUser(@PathVariable String userId) {
         return chatMessageService.getAllMessagesByUserId(userId);
+    }
+
+    //xoa notification chat
+    @DeleteMapping("/notification-chat/{roomId}/{userId}")
+    public void deleteNotificationChat(@PathVariable int roomId, @PathVariable String userId){
+        chatMessageService.deleteNotificationChat(roomId,userId);
+    }
+
+    @MessageMapping("/chat/{roomId}/typing")
+    public void typingNotification(TypingStatus typingStatus, @DestinationVariable String roomId) {
+
+        messagingTemplate.convertAndSend("/topic/room/" + roomId + "/typing", typingStatus);
     }
 }
