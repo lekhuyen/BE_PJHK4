@@ -4,9 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import fpt.aptech.server_be.dto.request.ChatMessageRequest;
 import fpt.aptech.server_be.dto.response.CategoryResponse;
 import fpt.aptech.server_be.dto.response.ChatMessResponse;
+import fpt.aptech.server_be.dto.response.ChatMessageResponse;
 import fpt.aptech.server_be.dto.response.ChatRoomResponse;
 import fpt.aptech.server_be.entities.ChatMessage;
 import fpt.aptech.server_be.entities.ChatRoom;
+import fpt.aptech.server_be.entities.TypingStatus;
 import fpt.aptech.server_be.entities.User;
 import fpt.aptech.server_be.repositories.ChatRoomRepository;
 import fpt.aptech.server_be.repositories.UserRepository;
@@ -18,6 +20,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.mutable.Mutable;
+import org.springframework.http.MediaType;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -57,31 +61,68 @@ public class ChatRoomController {
 //    @MessageMapping("/sendMessage/{roomId}")  // Client gửi tới /app/sendMessage/{roomId}
     // Client gửi tới /app/sendMessage/{roomId}
 //    @SendTo("/topic/room/{roomId}")  // Tin nhắn được gửi tới /topic/room/{roomId}
-@MessageMapping("/sendMessage")
-public void sendMessage(@RequestPart ChatMessageRequest messageRequest) throws JsonProcessingException {
-    ChatRoom chatRoom = chatRoomRepository.findById(messageRequest.getRoomId())
+
+
+//@MessageMapping("/sendMessage")
+//public void sendMessage(@RequestPart ChatMessageRequest messageRequest) throws JsonProcessingException {
+//    ChatRoom chatRoom = chatRoomRepository.findById(messageRequest.getRoomId())
+//            .orElseThrow(() -> new RuntimeException("Chat room not found"));
+//
+//    if (messageRequest.getImages() != null) {
+//        List<String> base64Images = messageRequest.getImages().stream()
+//                .map(file -> {
+//                    byte[] bytes = Base64.getEncoder().encode(file.getBytes());
+//                    return new String(bytes);
+//                })
+//                .collect(Collectors.toList());
+//
+//        messageRequest.setImages(base64Images);
+//    }
+//
+//    String message = chatMessageService.sendMessage(
+//            chatRoom,
+//            messageRequest.getSender(),
+//            messageRequest.getContent(),
+//            messageRequest.getImages()
+//    );
+//
+//    messagingTemplate.convertAndSend("/topic/room/" + messageRequest.getRoomId(), message);
+//}
+    @PostMapping(value = "/send-message",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+public ChatMessResponse sendMessages(@ModelAttribute ChatMessageRequest messageRequest) throws JsonProcessingException {
+        System.out.println("Received message: " + messageRequest.toString());
+        ChatRoom chatRoom = chatRoomRepository.findById(messageRequest.getRoomId())
             .orElseThrow(() -> new RuntimeException("Chat room not found"));
 
-    if (messageRequest.getImages() != null) {
-        List<String> base64Images = messageRequest.getImages().stream()
-                .map(file -> {
-                    byte[] bytes = Base64.getEncoder().encode(file.getBytes());
-                    return new String(bytes);
-                })
-                .collect(Collectors.toList());
+        assert messageRequest.getImages() != null;
 
-        messageRequest.setImages(base64Images);
-    }
-
-    String message = chatMessageService.sendMessage(
+        return chatMessageService.sendMessage(
             chatRoom,
             messageRequest.getSender(),
             messageRequest.getContent(),
             messageRequest.getImages()
     );
 
-    messagingTemplate.convertAndSend("/topic/room/" + messageRequest.getRoomId(), message);
 }
+
+
+    @MessageMapping("/sendMessage")
+//    @SendTo("/topic/messages")
+    public void sendMessage(ChatMessageRequest chatMessageRequest) throws JsonProcessingException {
+//        System.out.println("Received message: " + chatMessageRequest.toString());
+        ChatRoom chatRoom = chatRoomRepository.findById(chatMessageRequest.getRoomId())
+            .orElseThrow(() -> new RuntimeException("Chat room not found"));
+
+
+        ChatMessageResponse message = new ChatMessageResponse();
+        message.setRoomId(chatMessageRequest.getRoomId());
+            message.setRoomId(chatRoom.getId());
+            message.setContent(chatMessageRequest.getContent());
+            message.setSenderId(chatMessageRequest.getSender());
+            message.setImages(chatMessageRequest.getImagess());
+            message.setTimestamp(chatMessageRequest.getTimestamp());
+        messagingTemplate.convertAndSend("/topic/room/" + chatMessageRequest.getRoomId(), message);
+    }
 
 
 
@@ -101,5 +142,17 @@ public void sendMessage(@RequestPart ChatMessageRequest messageRequest) throws J
     @GetMapping("/room/message/room/{userId}")
     public List<ChatMessResponse> getMessageChatByUser(@PathVariable String userId) {
         return chatMessageService.getAllMessagesByUserId(userId);
+    }
+
+    //xoa notification chat
+    @DeleteMapping("/notification-chat/{roomId}/{userId}")
+    public void deleteNotificationChat(@PathVariable int roomId, @PathVariable String userId){
+        chatMessageService.deleteNotificationChat(roomId,userId);
+    }
+
+    @MessageMapping("/chat/{roomId}/typing")
+    public void typingNotification(TypingStatus typingStatus, @DestinationVariable String roomId) {
+
+        messagingTemplate.convertAndSend("/topic/room/" + roomId + "/typing", typingStatus);
     }
 }

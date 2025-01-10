@@ -64,4 +64,7 @@ public class Auction_Items {
     @JoinColumn(name = "categoryId", referencedColumnName = "category_id")
     Category category;
 
+    @OneToMany(mappedBy = "acAuctionItem", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ChatRoom> chatRooms;
+
 }

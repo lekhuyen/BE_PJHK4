@@ -24,7 +24,7 @@ public class Bidding {
     @JoinColumn(name = "item_id", referencedColumnName = "item_id")
     Auction_Items auction_Items;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     User user;
 

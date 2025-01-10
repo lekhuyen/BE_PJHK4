@@ -1,6 +1,7 @@
 package fpt.aptech.server_be.mapper;
 
 import fpt.aptech.server_be.dto.response.ChatRoomResponse;
+import fpt.aptech.server_be.dto.response.NotificationChatResponse;
 import fpt.aptech.server_be.entities.ChatMessage;
 import fpt.aptech.server_be.entities.ChatRoom;
 import org.mapstruct.Mapper;
@@ -20,10 +21,36 @@ public class ChatRoomMapper {
         response.setStarting_price(request.getAcAuctionItem().getStarting_price());
         response.setCurrent_price(request.getAcAuctionItem().getCurrent_price());
         response.setImages(request.getAcAuctionItem().getImages());
-        ChatMessage message = request.getMessage().stream().reduce((first,second)-> second).orElse(null);
-        if (message != null) {
-            response.setMessage(ChatMessageMapper.toChatMessageResponse(message));
+
+
+        if (request.getMessage() != null && !request.getMessage().isEmpty()) {
+            ChatMessage message = request.getMessage()
+                    .stream()
+                    .reduce((first, second) -> second)
+                    .orElse(null);
+            if (message != null) {
+                response.setMessage(ChatMessageMapper.toChatMessageResponse(message));
+            }
         }
+
+        NotificationChatResponse notificationChatResponse = new NotificationChatResponse();
+        if (request.getNotificationChat() != null) {
+            notificationChatResponse.setNotiId(request.getNotificationChat().getId());
+            notificationChatResponse.setRead(request.getNotificationChat().isRead());
+
+
+            notificationChatResponse.setChatroomId(request.getId());
+
+
+            notificationChatResponse.setQuantitySeller(request.getNotificationChat().getQuantitySeller());
+            notificationChatResponse.setQuantityBuyer(request.getNotificationChat().getQuantityBuyer());
+            notificationChatResponse.setBuyerId(request.getNotificationChat().getBuyerId());
+            notificationChatResponse.setSellerId(request.getNotificationChat().getSellerId());
+        }
+
+
+        response.setNotification(notificationChatResponse);
+
         return response;
     }
 }

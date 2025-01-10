@@ -25,7 +25,7 @@ public class ChatRoom {
     @JoinColumn(name = "product_id", nullable = false)
     private Auction_Items acAuctionItem;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "buyer_id", nullable = false)
     private User buyer;
 
@@ -35,5 +35,10 @@ public class ChatRoom {
     @ManyToOne
     @JoinColumn(name = "seller_id", nullable = false)
     private User seller;
+
+
+    @OneToOne
+    @JoinColumn(name = "notification")
+    private NotificationChat notificationChat;
 
 }
