@@ -4,15 +4,20 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import fpt.aptech.server_be.dto.request.Auction_ItemsRequest;
 import fpt.aptech.server_be.dto.response.Auction_ItemsResponse;
+import fpt.aptech.server_be.dto.response.NotificationAuctionItemResponse;
 import fpt.aptech.server_be.dto.response.PageResponse;
 import fpt.aptech.server_be.entities.Auction_Items;
 import fpt.aptech.server_be.entities.Category;
+import fpt.aptech.server_be.entities.NotificationAuctionItem;
 import fpt.aptech.server_be.entities.User;
 import fpt.aptech.server_be.exception.AppException;
 import fpt.aptech.server_be.exception.ErrorCode;
 import fpt.aptech.server_be.mapper.Auction_ItemsMapper;
+import fpt.aptech.server_be.mapper.NotificationAuctionItemMapper;
 import fpt.aptech.server_be.repositories.Auction_ItemsRepository;
 import fpt.aptech.server_be.repositories.CategoryRepository;
+import fpt.aptech.server_be.repositories.NotificationAuctionItemRepository;
+import fpt.aptech.server_be.repositories.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -20,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,7 +43,10 @@ public class Auction_ItemsService {
     Cloudinary cloudinary;
 
     Auction_ItemsRepository auction_ItemsRepository;
+    NotificationAuctionItemRepository notificationAuctionItemRepository;
     private final CategoryRepository categoryRepository;
+    private final SimpMessagingTemplate messagingTemplate;
+    UserRepository userRepository;
 
 
 
@@ -64,7 +73,7 @@ public class Auction_ItemsService {
             }
             else {
                 PageRequest pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by("updatedAt").descending());
-                auctionItems = auction_ItemsRepository.findAll(pageable);
+                auctionItems = auction_ItemsRepository.findAllS(pageable);
             }
 
             return PageResponse.<Auction_ItemsResponse>builder()
@@ -174,6 +183,8 @@ public class Auction_ItemsService {
 
     public void addAuction_Items(Auction_ItemsRequest request) {
 
+        User user = userRepository.findById(request.getUserId()).orElseThrow(() -> new RuntimeException("User not found"));
+
         List<MultipartFile> images = request.getImages();
 
         List<String> fileNames = new ArrayList<>();
@@ -200,6 +211,23 @@ public class Auction_ItemsService {
                     .orElseThrow(() -> new RuntimeException("Category not found"));
             auction_Items.setCategory(category);
          auction_ItemsRepository.save(auction_Items);
+
+
+//         thong bao
+        NotificationAuctionItem notificationAuctionItem = new NotificationAuctionItem();
+        notificationAuctionItem.setAuctionItemId(auction_Items.getItem_id());
+        notificationAuctionItem.setCreatedAt(new Date());
+        notificationAuctionItem.setUpdatedAt(new Date());
+        notificationAuctionItem.setType("P");
+        notificationAuctionItem.setCreator(user);
+
+        notificationAuctionItemRepository.save(notificationAuctionItem);
+
+        NotificationAuctionItemResponse notificationAuctionItemResponse = NotificationAuctionItemMapper
+                .toNotificationAuctionItemResponse(notificationAuctionItem);
+        messagingTemplate.convertAndSend("/topic/notification/product", notificationAuctionItemResponse);
+
+
     }
 
     public void updateAuction_Items(Auction_ItemsRequest request) throws IOException {
@@ -287,8 +315,26 @@ public class Auction_ItemsService {
             boolean updateStatus = !auction_Items.isStatus();
             auction_Items.setStatus(updateStatus);
             auction_ItemsRepository.save(auction_Items);
+
+            if(auction_Items.isStatus()) {
+                NotificationAuctionItem notificationAuctionItem = new NotificationAuctionItem();
+                notificationAuctionItem.setAuctionItemId(auction_Items.getItem_id());
+                notificationAuctionItem.setCreatedAt(new Date());
+                notificationAuctionItem.setUpdatedAt(new Date());
+                notificationAuctionItem.setType("T");
+                notificationAuctionItem.setCreator(auction_Items.getUser());
+
+                notificationAuctionItemRepository.save(notificationAuctionItem);
+
+                NotificationAuctionItemResponse notificationAuctionItemResponse = NotificationAuctionItemMapper
+                        .toNotificationAuctionItemResponse(notificationAuctionItem);
+                messagingTemplate.convertAndSend("/topic/notification/product/status", notificationAuctionItemResponse);
+            }
+
+
             return true;
         }
+
         return false;
     }
 
