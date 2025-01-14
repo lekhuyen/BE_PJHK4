@@ -10,6 +10,7 @@ import fpt.aptech.server_be.entities.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -37,8 +38,6 @@ public class UserMapper {
         UserResponse userResponse = new UserResponse();
         userResponse.setId(user.getId());
         userResponse.setName(user.getName());
-//        userResponse.setFirstName(user.getFirstName());
-//        userResponse.setLastName(user.getLastName());
         userResponse.setActive(user.getIsActive() != null ? user.getIsActive() : false);
         userResponse.setDob(user.getDob());
         userResponse.setEmail(user.getEmail());
@@ -49,6 +48,9 @@ public class UserMapper {
     }
 
     private static Set<RoleResponse> convertRoles(Set<Role> roles) {
+        if (roles == null) {
+            return Collections.emptySet(); // Trả về một Set rỗng thay vì `null`
+        }
         return roles.stream()
                 .map(role -> new RoleResponse(
                         role.getName(),

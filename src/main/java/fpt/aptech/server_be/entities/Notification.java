@@ -38,4 +38,6 @@ public class Notification {
     Date date = new Date();
 
     boolean auction = false;
+
+
 }
