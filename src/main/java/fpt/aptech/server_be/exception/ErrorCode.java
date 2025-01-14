@@ -25,6 +25,8 @@ public enum ErrorCode {
 
     PRODUCT_NOT_EXISTS(1009,"Product do not existed",HttpStatus.BAD_REQUEST),
     USER_INACTIVE(1010,"You had been locked",HttpStatus.BAD_REQUEST),
+
+    PRICE_HIGHER_CURRENT_PRICE(1011,"Your bid must be higher than your previously bid",HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(int code, String message,HttpStatusCode statusCode) {

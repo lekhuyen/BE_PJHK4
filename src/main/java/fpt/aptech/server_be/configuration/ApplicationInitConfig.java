@@ -1,5 +1,6 @@
 package fpt.aptech.server_be.configuration;
 
+
 import fpt.aptech.server_be.entities.User;
 import fpt.aptech.server_be.enums.Role;
 import fpt.aptech.server_be.repositories.UserRepository;
@@ -7,7 +8,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

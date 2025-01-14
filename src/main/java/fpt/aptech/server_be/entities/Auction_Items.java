@@ -1,11 +1,13 @@
 package fpt.aptech.server_be.entities;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -29,6 +31,9 @@ public class Auction_Items {
     LocalDate start_date;
     LocalDate end_date;
     String bid_step;
+
+    @OneToOne(mappedBy = "auction_Items", cascade = CascadeType.ALL)
+    Bidding bidding;
 
     boolean isSell;
     boolean status ;
@@ -58,4 +63,8 @@ public class Auction_Items {
     @ManyToOne
     @JoinColumn(name = "categoryId", referencedColumnName = "category_id")
     Category category;
+
+    @OneToMany(mappedBy = "acAuctionItem", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ChatRoom> chatRooms;
+
 }

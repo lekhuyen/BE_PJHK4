@@ -12,10 +12,10 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+
 
 @Slf4j
 @RestController
@@ -31,10 +31,21 @@ public class AuctionController {
     @GetMapping
     public ApiResponse<PageResponse<Auction_ItemsResponse>> getAllAuctions(
             @RequestParam(value = "page", required = false,defaultValue = "1") int page,
-            @RequestParam(value = "size", required = false,defaultValue = "3") int size
+            @RequestParam(value = "size", required = false,defaultValue = "3") int size,
+            @RequestParam(value = "name", required = false) String name
     ) {
         return ApiResponse.<PageResponse<Auction_ItemsResponse>>builder()
-                .result(auction_ItemsService.getAllAuction_Items( page, size))
+                .result(auction_ItemsService.getAllAuction_Items( page, size,name))
+                .build();
+    }
+
+    @GetMapping("category/{id}")
+    public ApiResponse<PageResponse<Auction_ItemsResponse>> getAuctionByCategory(@PathVariable int id,
+                                 @RequestParam(value = "page", required = false,defaultValue = "1") int page,
+                                  @RequestParam(value = "size", required = false,defaultValue = "3") int size) {
+        PageResponse<Auction_ItemsResponse> response = auction_ItemsService.getAuctionItemByCategory(id, page, size);
+        return ApiResponse.<PageResponse<Auction_ItemsResponse>> builder()
+                .result(response)
                 .build();
     }
 //    @GetMapping
@@ -92,6 +103,20 @@ public class AuctionController {
         return ApiResponse.<Boolean> builder()
                 .code(1)
                 .message("Update auction item failed")
+                .build();
+    }
+
+    @PutMapping("issell/{id}")
+    public Boolean updateAuctionIsSell(@PathVariable int id) {
+        return auction_ItemsService.updateIsSell(id);
+    }
+
+    @GetMapping("get-onhome")
+    public ApiResponse<List<Auction_ItemsResponse>> getAuctionOnHome() {
+        List<Auction_ItemsResponse> list = auction_ItemsService.getAuctionsOnHome();
+
+        return ApiResponse.<List<Auction_ItemsResponse>>builder()
+                .result(list)
                 .build();
     }
 }

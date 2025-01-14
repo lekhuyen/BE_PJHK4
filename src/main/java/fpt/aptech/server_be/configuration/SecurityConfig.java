@@ -13,9 +13,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
@@ -46,6 +43,7 @@ public class SecurityConfig {
     private final String[] PUBLIC_ENDPOINTS_GET = {
             "/api/users/**",
             "/api/auction/**",
+            "/api/bidding/**",
     };
     private final String[] PUBLIC_ENDPOINTS_DELETE = {
             "/api/users/**",
@@ -73,6 +71,14 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, PUBLIC_ENDPOINTS_DELETE).permitAll()
                         .requestMatchers(HttpMethod.PUT, PUBLIC_ENDPOINTS_PUT).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/category/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/bidding/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/auction/category/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/auction/get-onhome").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/contact/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/contact").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/contact/**").permitAll()
+
+
 
                         .requestMatchers("/ws/**").permitAll()
 
