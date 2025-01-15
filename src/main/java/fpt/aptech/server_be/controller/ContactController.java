@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -65,11 +66,25 @@ public class ContactController {
     public ResponseEntity<ContactRespone> getContactById(@PathVariable int id) {
         try {
             Optional<ContactRespone> contactRespone = contactService.getContactById(id);
-            return contactRespone.map(response -> new ResponseEntity<>(response, HttpStatus.OK))
-                    .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+            if (contactRespone.isPresent()) {
+                log.info("Contact details: {}", contactRespone.get()); // Log the contact details
+                return new ResponseEntity<>(contactRespone.get(), HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
         } catch (Exception e) {
             log.error("Error fetching contact with ID " + id + ": ", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("/countryCodes")
+    public List<String> getCountryCodes() {
+        return Arrays.asList("US", "UK", "INDIA");
+    }
+
+    @GetMapping("/interestedInOptions")
+    public List<String> getInterestedInOptions() {
+        return Arrays.asList("CONTACT", "FEEDBACK", "REPORT");
     }
 }
