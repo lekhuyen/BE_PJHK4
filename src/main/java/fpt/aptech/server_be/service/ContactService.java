@@ -9,9 +9,11 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,19 +24,19 @@ import java.util.Optional;
 public class ContactService {
 
     private final ContactRepository contactRepository;  // Inject ContactRepository instance
-
     private final ContactMapper contactMapper;  // Inject ContactMapper instance
+    private final JavaMailSender emailSender;  // Inject JavaMailSender to send emails
 
     // Create a new contact
     public ContactRespone createContact(ContactRequest contactRequest) {
-        // Convert ContactRequest to Contact entity
-        Contact contact = contactMapper.toEntity(contactRequest);
-
-        // Save the contact entity to the repository using the injected instance
-        contact = contactRepository.save(contact);
-
-        // Convert the saved Contact entity back to a ContactRespone DTO
-        return contactMapper.toResponse(contact);
+        try {
+            Contact contact = contactMapper.toEntity(contactRequest);
+            contact = contactRepository.save(contact);
+            return contactMapper.toResponse(contact);
+        } catch (Exception e) {
+            log.error("Error creating contact", e);
+            throw new RuntimeException("Error creating contact: " + e.getMessage());
+        }
     }
 
     // Update an existing contact (typically to add the admin's reply)
@@ -43,8 +45,7 @@ public class ContactService {
         Optional<Contact> existingContactOpt = contactRepository.findById(contactRespone.getId());
 
         if (existingContactOpt.isEmpty()) {
-            // Return an error or handle it as needed if the contact doesn't exist
-            // (You can throw an exception or return null, etc.)
+            // Handle the case if the contact doesn't exist
             throw new IllegalArgumentException("Contact not found with ID: " + contactRespone.getId());
         }
 
@@ -54,33 +55,51 @@ public class ContactService {
         // Update fields from the ContactRespone DTO
         existingContact.setReplyMessage(contactRespone.getReplyMessage());  // Set the admin's reply
         existingContact.setInterestedIn(contactRespone.getInterestedIn());  // Update other fields if needed
-        // Add other fields to update as necessary (e.g., name, email, etc.)
+        existingContact.setReplyTime(LocalDateTime.now());  // Set the reply time when updating the contact
 
         // Save the updated contact entity to the repository
         existingContact = contactRepository.save(existingContact);
 
         // Convert the updated Contact entity back to a ContactRespone DTO
-        return contactMapper.toResponse(existingContact);
+        ContactRespone updatedContact = contactMapper.toResponse(existingContact);
+
+        // Send an email to the user
+        sendReplyEmail(existingContact);
+
+        return updatedContact;
     }
 
+    // Send an email to the user after the reply message is updated
+    private void sendReplyEmail(Contact contact) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(contact.getEmail());  // Send email to the contact's email
+            message.setSubject("Your Contact Inquiry - Reply Received");
+            message.setText("Dear " + contact.getName() + ",\n\n" +
+                    "We have received your inquiry and here is our response:\n\n" +
+                    contact.getReplyMessage() + "\n\n" +
+                    "Best regards,\n" +
+                    "Your Company Name");
+
+            // Send the email
+            emailSender.send(message);
+            log.info("Reply email sent to: " + contact.getEmail());
+        } catch (Exception e) {
+            log.error("Failed to send reply email to: " + contact.getEmail(), e);
+        }
+    }
 
     // Get all contacts
     public List<ContactRespone> getAllContacts() {
-        // Fetch all contacts from the repository
         List<Contact> contacts = contactRepository.findAll();
-
-        // Convert the list of Contact entities to a list of ContactRespone DTOs
         return contacts.stream()
                 .map(contactMapper::toResponse)
-                .toList();  // Use Java Streams to map all entities to DTOs
+                .toList();
     }
 
     // Get a contact by ID
     public Optional<ContactRespone> getContactById(int id) {
-        // Fetch the contact from the repository by ID
         Optional<Contact> contact = contactRepository.findById(id);
-
-        // If found, convert to a ContactRespone DTO, else return empty Optional
         return contact.map(contactMapper::toResponse);
     }
 }
