@@ -19,5 +19,8 @@ public class ContactRequest {
     InterestedIn interestedIn;  // Enum field
     String message;
     String replyMessage;
-}
 
+    // Add this field to allow setting the country phone code
+    String countryPhoneCode;
+
+}
