@@ -26,12 +26,13 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+
+
 @RestController
 @RequestMapping("/api/aboutuscard")
 public class AboutUsCardController {
 
     private final AboutUsCardService aboutUsCardService;
-
     private static final String UPLOAD_DIR = "images/";  // Directory for uploaded images
     private final AboutUsCardRepository aboutUsCardRepository;
 
@@ -43,24 +44,20 @@ public class AboutUsCardController {
     @GetMapping()
     // Get all AboutUsCard records
     public List<AboutUsCardResponse> getAll() {
-        // Fetch all AboutUsCard entities from the database
         List<AboutUsCard> aboutUsCards = aboutUsCardRepository.findAll();
-
-        // Convert the entities to response DTOs
         return aboutUsCards.stream()
-                .map(AboutUsCardMapper::toResponse)  // Use the mapper to convert to DTO
-                .collect(Collectors.toList());  // Collect into a list and return
+                .map(AboutUsCardMapper::toResponse)
+                .collect(Collectors.toList());
     }
 
-    @GetMapping("/{title}")
-// Get an AboutUsCard by title (ID)
-    public AboutUsCardResponse getById(@PathVariable("title") String title) {
-        Optional<AboutUsCard> aboutUsCard = aboutUsCardRepository.findById(title);
-        return aboutUsCard.map(AboutUsCardMapper::toResponse)
-                .orElseThrow(() -> new RuntimeException("AboutUsCard not found with title: " + title));
+    @GetMapping("/{id}")
+    // Get an AboutUsCard by id
+    public AboutUsCardResponse getById(@PathVariable("id") int id) {
+        AboutUsCard aboutUsCard = aboutUsCardRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("AboutUsCard not found with id: " + id));
+        return AboutUsCardMapper.toResponse(aboutUsCard);
     }
 
-    // Create AboutUsCard with image upload
     @PostMapping()
     public ResponseEntity<AboutUsCardResponse> create(
             @RequestParam("file1") MultipartFile file1,
@@ -88,8 +85,12 @@ public class AboutUsCardController {
                 file1.transferTo(targetLocation);
                 aboutUsCardRequest.setAboutCardImage(uniqueFileName);
             } catch (IOException ex) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(new AboutUsCardResponse("Error saving the image", "", ""));
+                AboutUsCardResponse errorResponse = new AboutUsCardResponse();
+                errorResponse.setDescription("Error saving the image");
+                errorResponse.setAboutCardImage("");
+                errorResponse.setTitle("");  // Or set a specific title if needed
+
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
             }
         }
 
@@ -98,20 +99,20 @@ public class AboutUsCardController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    // Edit AboutUsCard with image update
-    @PutMapping("/{title}")
+    @PutMapping("/{id}")
     public ResponseEntity<AboutUsCardResponse> edit(
-            @PathVariable("title") String title,
+            @PathVariable("id") int id,
             @RequestParam(value = "file1", required = false) MultipartFile file1,
+            @RequestParam("title") String title,  // Add title as a parameter
             @RequestParam("description") String description) {
 
-        // Create AboutUsCardRequest for update
+        // Create AboutUsCardRequest with the provided description and title
         AboutUsCardRequest aboutUsCardRequest = new AboutUsCardRequest();
-        aboutUsCardRequest.setTitle(title);
-        aboutUsCardRequest.setDescription(description);
+        aboutUsCardRequest.setTitle(title);  // Set the title
+        aboutUsCardRequest.setDescription(description);  // Set the description
 
-        // Find the existing AboutUsCard by title
-        AboutUsCardResponse existingCard = aboutUsCardService.getById(title);
+        // Find the existing AboutUsCard by id
+        AboutUsCardResponse existingCard = aboutUsCardService.getById(id);
         if (existingCard == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
@@ -136,22 +137,25 @@ public class AboutUsCardController {
                 file1.transferTo(targetLocation);
                 aboutUsCardRequest.setAboutCardImage(uniqueFileName);
             } catch (IOException ex) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(new AboutUsCardResponse("Error updating the image",  "", ""));
+                AboutUsCardResponse errorResponse = new AboutUsCardResponse();
+                errorResponse.setDescription("Error updating the image");
+                errorResponse.setAboutCardImage("");
+                errorResponse.setTitle(title);  // Set the title in the error response as well
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
             }
         }
 
         // Update the AboutUsCard using the service
-        AboutUsCardResponse response = aboutUsCardService.edit(title, aboutUsCardRequest);
+        AboutUsCardResponse response = aboutUsCardService.edit(id, aboutUsCardRequest);
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/{title}")
-    // Delete an AboutUsCard by title
-    public ResponseEntity<Void> delete(@PathVariable("title") String title) {
-        // Find the AboutUsCard entity by title
-        AboutUsCard aboutUsCard = aboutUsCardRepository.findById(title)
-                .orElseThrow(() -> new RuntimeException("AboutUsCard not found with title: " + title));
+
+    @DeleteMapping("/{id}")
+    // Delete an AboutUsCard by id
+    public ResponseEntity<Void> delete(@PathVariable("id") int id) {
+        AboutUsCard aboutUsCard = aboutUsCardRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("AboutUsCard not found with id: " + id));
 
         // Delete the image if it exists
         String aboutCardImage = aboutUsCard.getAboutCardImage();
@@ -193,6 +197,5 @@ public class AboutUsCardController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
-
 }
+

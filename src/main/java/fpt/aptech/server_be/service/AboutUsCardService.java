@@ -8,7 +8,6 @@ import fpt.aptech.server_be.repositories.AboutUsCardRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,11 +27,11 @@ public class AboutUsCardService {
                 .collect(Collectors.toList());
     }
 
-    // Get an AboutUsCard by title (ID)
-    public AboutUsCardResponse getById(String title) {
-        Optional<AboutUsCard> aboutUsCard = aboutUsCardRepository.findById(title);
-        return aboutUsCard.map(AboutUsCardMapper::toResponse)
-                .orElseThrow(() -> new RuntimeException("AboutUsCard not found with title: " + title));
+    // Get an AboutUsCard by ID
+    public AboutUsCardResponse getById(int id) {
+        AboutUsCard aboutUsCard = aboutUsCardRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("AboutUsCard not found with id: " + id));
+        return AboutUsCardMapper.toResponse(aboutUsCard); // Corrected method call
     }
 
     // Create a new AboutUsCard
@@ -47,13 +46,14 @@ public class AboutUsCardService {
         return AboutUsCardMapper.toResponse(savedAboutUsCard);
     }
 
-    // Edit an existing AboutUsCard by title
-    public AboutUsCardResponse edit(String title, AboutUsCardRequest aboutUsCardRequest) {
-        // Check if the AboutUsCard exists
-        AboutUsCard existingAboutUsCard = aboutUsCardRepository.findById(title)
-                .orElseThrow(() -> new RuntimeException("AboutUsCard not found with title: " + title));
+    // Edit an existing AboutUsCard by ID
+    public AboutUsCardResponse edit(int id, AboutUsCardRequest aboutUsCardRequest) {  // Changed title to id
+        // Check if the AboutUsCard exists by ID
+        AboutUsCard existingAboutUsCard = aboutUsCardRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("AboutUsCard not found with id: " + id));
 
         // Update fields
+        existingAboutUsCard.setTitle(aboutUsCardRequest.getTitle());  // You can now update the title as well
         existingAboutUsCard.setDescription(aboutUsCardRequest.getDescription());
         existingAboutUsCard.setAboutCardImage(aboutUsCardRequest.getAboutCardImage());
 
@@ -64,11 +64,11 @@ public class AboutUsCardService {
         return AboutUsCardMapper.toResponse(updatedAboutUsCard);
     }
 
-    // Delete an AboutUsCard by title
-    public void delete(String title) {
-        // Check if the AboutUsCard exists
-        AboutUsCard aboutUsCard = aboutUsCardRepository.findById(title)
-                .orElseThrow(() -> new RuntimeException("AboutUsCard not found with title: " + title));
+    // Delete an AboutUsCard by ID
+    public void delete(int id) {  // Changed title to id
+        // Check if the AboutUsCard exists by ID
+        AboutUsCard aboutUsCard = aboutUsCardRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("AboutUsCard not found with id: " + id));
 
         // Delete the entity
         aboutUsCardRepository.delete(aboutUsCard);

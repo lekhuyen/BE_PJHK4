@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class AboutUsCardResponse {
 
+    int id;
     String title;
     String description;
     String aboutCardImage;
