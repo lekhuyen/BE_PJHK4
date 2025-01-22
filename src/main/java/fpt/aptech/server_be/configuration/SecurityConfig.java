@@ -80,6 +80,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/aboutus/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/aboutus").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/api/aboutus/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/aboutuscard/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/aboutuscard").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/aboutuscard/**").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/aboutuscard/**").permitAll()
+
 
 
 
