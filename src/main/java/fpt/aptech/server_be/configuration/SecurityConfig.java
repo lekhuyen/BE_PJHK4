@@ -84,6 +84,13 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/aboutuscard").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/api/aboutuscard/**").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/api/aboutuscard/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/reviewitem/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/reviewitem").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/reviewitem/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/blog/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/blog").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/blog/**").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/blog/**").permitAll()
 
 
 
