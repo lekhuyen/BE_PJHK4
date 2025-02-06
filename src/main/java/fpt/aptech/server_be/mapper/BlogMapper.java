@@ -1,7 +1,5 @@
 package fpt.aptech.server_be.mapper;
 
-import fpt.aptech.server_be.dto.request.AboutUsRequest;
-import fpt.aptech.server_be.dto.request.BlogRequest;
 import fpt.aptech.server_be.dto.response.BlogResponse;
 import fpt.aptech.server_be.entities.Blog;
 import org.mapstruct.Mapper;
