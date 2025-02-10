@@ -187,18 +187,23 @@ public class BiddingService {
     public boolean auctionSuccess(int productId,String sellerId){
         Auction_Items auctionItem = auctionItemsRepository.findById(productId)
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_EXISTS));
+
+        Bidding bidding = biddingRepository.findBiddingByAuction_Items(auctionItem);
+
+
+        User buyer = userRepository.findById(bidding.getUser().getId())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
         if(auctionItem!= null){
             auctionItem.setSoldout(true);
+            auctionItem.setBuyer(buyer);
             auctionItemsRepository.save(auctionItem);
         }
 
         User seller = userRepository.findById(sellerId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-        Bidding bidding = biddingRepository.findBiddingByAuction_Items(auctionItem);
 
-        User buyer = userRepository.findById(bidding.getUser().getId())
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
 
 

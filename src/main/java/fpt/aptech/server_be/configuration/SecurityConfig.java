@@ -74,6 +74,13 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/bidding/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/auction/category/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/auction/get-onhome").permitAll()
+
+                        .requestMatchers(HttpMethod.GET, "/api/rooms/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/agora/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/payment/vn-pay").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/payment/vn-pay-callback").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/auction/creator/**").permitAll()
+
                         .requestMatchers(HttpMethod.GET, "/api/contact/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/contact").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/api/contact/**").permitAll()
@@ -91,6 +98,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/blog").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/api/blog/**").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/api/blog/**").permitAll()
+
 
 
 

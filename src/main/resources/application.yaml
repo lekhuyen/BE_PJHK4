@@ -36,8 +36,24 @@ spring:
 
 jwt:
   signerKey: "pDozQy8Ihk/phzNwDBNzRmuWvnA6YkDg/D1mmO4FpejrQJ3kVTf10AcELK1qJnGW"
-  valid-duration: 3600 #second
+  valid-duration: 360000 #second
   refreshtable-duration: 360000
+
+agora:
+  appId: "9b1d7859b01d4f7fbb071c2e16681b0f"
+  appCertificate: "b3ac1b87350c4b3b99bfe2dbb7663550"
+  tokenApiUrl: "https://api:agora:io/v1/token"
+
+payment:
+  vnPay:
+    url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+    tmnCode: GLI8RRMU
+    secretKey: A7G4E6A8TGB8TO0J2FR4Z574LHJGHUP0
+    returnUrl: http://localhost:8080/api/v1/payment/vn-pay-callback
+    version: 2.1.0
+    command: pay
+    orderType: other
+
 
 
 

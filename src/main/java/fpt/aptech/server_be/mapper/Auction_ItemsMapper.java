@@ -53,8 +53,10 @@ public class Auction_ItemsMapper {
         response.setBid_step(auctionItems.getBid_step());
         response.setStatus(auctionItems.isStatus());
         response.setSell(auctionItems.isSell());
+        response.setPaid(auctionItems.isPaid());
         response.setSoldout(auctionItems.isSoldout());
         response.setUser(UserMapper.toUserResponse(auctionItems.getUser()));
+        response.setBuyer(UserMapper.toUserResponse(auctionItems.getBuyer()));
 //        mapCommonFields(auctionItems, response);
         response.setCategory(toCategoryResponse(auctionItems.getCategory()));
 
