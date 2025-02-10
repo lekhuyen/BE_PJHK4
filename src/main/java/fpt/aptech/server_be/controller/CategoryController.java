@@ -46,8 +46,8 @@ public class CategoryController {
 
     @GetMapping
     public ApiResponse<PageResponse<CategoryResponse>> getCategory(
-            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
-            @RequestParam(value = "size", required = false, defaultValue = "3") int size
+            @RequestParam(value = "page", required = false) Integer page,
+            @RequestParam(value = "size", required = false) Integer size
     ) {
         PageResponse<CategoryResponse> category = categoryService.getAllCategories(page,size);
         return ApiResponse.<PageResponse<CategoryResponse>>builder()
