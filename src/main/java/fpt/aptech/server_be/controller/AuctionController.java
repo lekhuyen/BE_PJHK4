@@ -91,6 +91,26 @@ public class AuctionController {
                 .build();
     }
 
+    @GetMapping("/creator/{id}")
+    public ApiResponse<List<Auction_ItemsResponse>> getAuctionByCreator(@PathVariable String id) {
+        List<Auction_ItemsResponse> auctionItemsResponses = auction_ItemsService.getAllByCreator(id);
+        return ApiResponse.<List<Auction_ItemsResponse>> builder()
+                .code(0)
+                .message("Get auction item successfully")
+                .result(auctionItemsResponses)
+                .build();
+    }
+
+    @GetMapping("/buyer/{id}")
+    public ApiResponse<List<Auction_ItemsResponse>> getAuctionByBuyer(@PathVariable String id) {
+        List<Auction_ItemsResponse> auctionItemsResponses = auction_ItemsService.getAllByBuyer(id);
+        return ApiResponse.<List<Auction_ItemsResponse>> builder()
+                .code(0)
+                .message("Get auction item successfully")
+                .result(auctionItemsResponses)
+                .build();
+    }
+
     @PutMapping("/status/{id}")
     public ApiResponse<Boolean> updateAuctionStatus(@PathVariable int id) {
       boolean isUpdate =  auction_ItemsService.updateStatus(id);

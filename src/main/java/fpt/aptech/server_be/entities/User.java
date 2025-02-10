@@ -51,6 +51,9 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     List<Auction_Items> auctionItems;
 
+    @OneToMany(mappedBy = "buyer", cascade = CascadeType.ALL)
+    List<Auction_Items> auctionItemsBuyer;
+
     @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL)
     List<Notification> sellerNotifications; // Notifications where the user is the seller
 

@@ -107,6 +107,19 @@ public class Auction_ItemsService {
                 .build();
     }
 
+//    get all by user
+    public List<Auction_ItemsResponse> getAllByCreator(String creator) {
+        User user = userRepository.findById(creator).orElseThrow(() -> new RuntimeException("User is not found"));
+        List<Auction_Items> auctionItems = auction_ItemsRepository.findAllByUser(user);
+        return auctionItems.stream().map(Auction_ItemsMapper::toAuction_ItemsResponse).collect(Collectors.toList());
+    }
+
+    public List<Auction_ItemsResponse> getAllByBuyer(String buyer) {
+        User user = userRepository.findById(buyer).orElseThrow(() -> new RuntimeException("User is not found"));
+        List<Auction_Items> auctionItems = auction_ItemsRepository.findAllBuyer(user);
+        return auctionItems.stream().map(Auction_ItemsMapper::toAuction_ItemsResponse).collect(Collectors.toList());
+    }
+
 //=============================================================================== k dc xoa
     public PageResponse<Auction_ItemsResponse> getAllAuction_Itemsssss(int page, int size) {
 
@@ -151,7 +164,7 @@ public class Auction_ItemsService {
                 .orElseThrow(() -> new RuntimeException("Category not found"));
 
         if (page == null || size == null || (page == 0 && size == 0)) {
-            List<Auction_Items> auctionItems = auction_ItemsRepository.getAuction_ItemsByCategory(category);
+            List<Auction_Items> auctionItems = auction_ItemsRepository.getAuction_ItemsByCategoryId(category);
             auctionItems.sort((item1, item2) -> item2.getUpdatedAt().compareTo(item1.getUpdatedAt()));
             return PageResponse.<Auction_ItemsResponse>builder()
                     .currentPage(1)
