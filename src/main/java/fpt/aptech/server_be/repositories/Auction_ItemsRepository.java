@@ -3,6 +3,7 @@ package fpt.aptech.server_be.repositories;
 import fpt.aptech.server_be.dto.response.Auction_ItemsResponse;
 import fpt.aptech.server_be.entities.Auction_Items;
 import fpt.aptech.server_be.entities.Category;
+import fpt.aptech.server_be.entities.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,13 +13,24 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface Auction_ItemsRepository extends JpaRepository<Auction_Items, Integer> {
-    public List<Auction_Items> getAuction_ItemsByCategory(Category category);
-    Page<Auction_Items> findByCategory(Category category, Pageable pageable);
+    @Query("SELECT a FROM Auction_Items a WHERE a.status = true AND a.category = :category")
+    List<Auction_Items> getAuction_ItemsByCategoryId(@Param("category") Category category);
+
+    @Query("SELECT a FROM Auction_Items a WHERE a.status = true AND a.category = :category")
+    Page<Auction_Items> findByCategory(@Param("category") Category category, Pageable pageable);
+
+
     @Query("select a from Auction_Items a where a.item_name like %:name% and a.status = true")
     Page<Auction_Items> findAllByItem_name(@Param("name") String name, Pageable pageable);
 
 
     @Query("select a from Auction_Items a where a.status = true")
     Page<Auction_Items> findAllS(Pageable pageable);
+
+    @Query("select a from Auction_Items a where a.user= :user")
+    List<Auction_Items> findAllByUser(@Param("user") User user);
+
+    @Query("select a from Auction_Items a where a.buyer= :buyer")
+    List<Auction_Items> findAllBuyer(@Param("buyer") User buyer);
 
 }

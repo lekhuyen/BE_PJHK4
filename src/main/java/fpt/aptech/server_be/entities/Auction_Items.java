@@ -38,6 +38,9 @@ public class Auction_Items {
     boolean isSell;
     boolean status ;
     boolean isSoldout;
+
+    @Column(nullable = false, columnDefinition = "BIT DEFAULT 0")
+    boolean isPaid = false;
     double width = 12.1;
     double height = 12.1;
 
@@ -58,6 +61,10 @@ public class Auction_Items {
     @ManyToOne
     @JoinColumn(name = "seller_Id", referencedColumnName = "id")
     User user;
+
+    @ManyToOne
+    @JoinColumn(name = "buyer_Id", referencedColumnName = "id")
+    User buyer;
 
     // Many-to-one relationship with Category
     @ManyToOne
