@@ -139,4 +139,19 @@ public class AuctionController {
                 .result(list)
                 .build();
     }
+
+
+    @GetMapping("/featured")
+    public ApiResponse<List<Auction_ItemsResponse>> getFeaturedAuctions() {
+        return ApiResponse.<List<Auction_ItemsResponse>>builder()
+                .result(auction_ItemsService.getFeaturedAuctions())
+                .code(0).build();
+    }
+
+    @GetMapping("/upcoming")
+    public ApiResponse<List<Auction_ItemsResponse>> getUpcomingAuctions() {
+        return ApiResponse.<List<Auction_ItemsResponse>>builder()
+                .result(auction_ItemsService.getUpcomingAuctions())
+                .code(0).build();
+    }
 }

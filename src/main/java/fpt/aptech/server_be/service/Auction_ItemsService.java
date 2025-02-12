@@ -191,6 +191,20 @@ public class Auction_ItemsService {
                 .build();
     }
 
+    public List<Auction_ItemsResponse> getFeaturedAuctions() {
+        List<Auction_Items> featuredItems = auction_ItemsRepository.findByIsSellTrue();
+        return featuredItems.stream()
+                .map(Auction_ItemsMapper::toAuction_ItemsResponse)
+                .collect(Collectors.toList());
+    }
+
+    public List<Auction_ItemsResponse> getUpcomingAuctions() {
+        List<Auction_Items> upcomingItems = auction_ItemsRepository.findByIsSellFalse();
+        return upcomingItems.stream()
+                .map(Auction_ItemsMapper::toAuction_ItemsResponse)
+                .collect(Collectors.toList());
+    }
+
 
 
 

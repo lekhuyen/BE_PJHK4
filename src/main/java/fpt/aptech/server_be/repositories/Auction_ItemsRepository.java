@@ -33,4 +33,10 @@ public interface Auction_ItemsRepository extends JpaRepository<Auction_Items, In
     @Query("select a from Auction_Items a where a.buyer= :buyer")
     List<Auction_Items> findAllBuyer(@Param("buyer") User buyer);
 
+    // Lấy danh sách sản phẩm đã bán (Featured)
+    List<Auction_Items> findByIsSellTrue();
+
+    // Lấy danh sách sản phẩm chưa bán (Upcoming)
+    List<Auction_Items> findByIsSellFalse();
+
 }
