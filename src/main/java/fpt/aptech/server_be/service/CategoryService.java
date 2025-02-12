@@ -41,9 +41,9 @@ public class CategoryService {
         return CategoryMapper.toCategoryResponse(category);
     }
 
-    public PageResponse<CategoryResponse> getAllCategories(int page, int size) {
+    public PageResponse<CategoryResponse> getAllCategories(Integer page, Integer size) {
 
-        if (page == 0 && size == 0){
+        if (page == null || size == null || (page == 0 && size == 0)){
             List<Category> allCategories = categoryRepository.findAll();
             return PageResponse.<CategoryResponse>builder()
                     .currentPage(1)

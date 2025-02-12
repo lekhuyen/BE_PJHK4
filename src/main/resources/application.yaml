@@ -24,6 +24,8 @@ spring:
     host: smtp.gmail.com
     username: khuyenle541@gmail.com
     password: qzjgbglxidzmzibn
+#    username: phamduyhau2000@gmail.com
+#    password: tmag jpbi gpcv bnpf
     port: 587
     properties:
       mail:
