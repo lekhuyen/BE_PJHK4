@@ -74,6 +74,8 @@ public class AuthenticationService {
         var token = generateToken(user);
         return AuthenticationResponse.builder()
                 .token(token)
+                .username(user.getName())
+                .userId(user.getId())
                 .authenticated(true)
                 .build();
     }
