@@ -11,4 +11,6 @@ import lombok.experimental.FieldDefaults;
 public class AuthenticationResponse {
     String token;
     boolean authenticated;
+    private String username; // ✅ Thêm trường username
+    private String userId;
 }
