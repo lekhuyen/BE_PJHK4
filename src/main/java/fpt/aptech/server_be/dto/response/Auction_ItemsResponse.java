@@ -30,11 +30,13 @@ public class Auction_ItemsResponse {
     boolean status;
     boolean isSell;
     boolean isSoldout;
+    boolean isPaid;
 //    double width;
 //    double height;
 
     CategoryResponse category;
     UserResponse user;
+    UserResponse buyer;
 
     BiddingResponse bidding;
 

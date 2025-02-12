@@ -3,10 +3,7 @@ package fpt.aptech.server_be.service;
 import fpt.aptech.server_be.dto.request.BiddingRequest;
 import fpt.aptech.server_be.dto.response.BiddingResponse;
 import fpt.aptech.server_be.dto.response.NotificationResponse;
-import fpt.aptech.server_be.entities.Auction_Items;
-import fpt.aptech.server_be.entities.Bidding;
-import fpt.aptech.server_be.entities.Notification;
-import fpt.aptech.server_be.entities.User;
+import fpt.aptech.server_be.entities.*;
 import fpt.aptech.server_be.exception.AppException;
 import fpt.aptech.server_be.exception.ErrorCode;
 import fpt.aptech.server_be.mapper.BiddingMapper;
@@ -43,6 +40,9 @@ public class BiddingService {
     @Autowired
     private NotificationRepository notificationRepository;
     private final SimpMessagingTemplate messagingTemplate;
+
+    @Autowired
+    KafkaProducer kafkaProducer;
 
     final JavaMailSender mailSender;
 
@@ -187,18 +187,23 @@ public class BiddingService {
     public boolean auctionSuccess(int productId,String sellerId){
         Auction_Items auctionItem = auctionItemsRepository.findById(productId)
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_EXISTS));
+
+        Bidding bidding = biddingRepository.findBiddingByAuction_Items(auctionItem);
+
+
+        User buyer = userRepository.findById(bidding.getUser().getId())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
         if(auctionItem!= null){
             auctionItem.setSoldout(true);
+            auctionItem.setBuyer(buyer);
             auctionItemsRepository.save(auctionItem);
         }
 
         User seller = userRepository.findById(sellerId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-        Bidding bidding = biddingRepository.findBiddingByAuction_Items(auctionItem);
 
-        User buyer = userRepository.findById(bidding.getUser().getId())
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
 
 
@@ -239,5 +244,89 @@ public class BiddingService {
         return true;
 
     }
+
+//    public boolean auctionSuccesss(int productId, String sellerId) {
+//        Auction_Items auctionItem = auctionItemsRepository.findById(productId)
+//                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_EXISTS));
+//
+//        Bidding bidding = biddingRepository.findBiddingByAuction_Items(auctionItem);
+//
+//        User buyer = userRepository.findById(bidding.getUser().getId())
+//                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+//
+//        if (auctionItem != null) {
+//            auctionItem.setSoldout(true);
+//            auctionItem.setBuyer(buyer);
+//            auctionItemsRepository.save(auctionItem);
+//        }
+//
+//        User seller = userRepository.findById(sellerId)
+//                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+//
+//        // Create the event to send to Kafka
+//        AuctionSuccessEvent event = new AuctionSuccessEvent(
+//                productId,
+//                sellerId,
+//                buyer.getEmail(),
+//                seller.getEmail(),
+//                auctionItem.getItem_name(),
+//                bidding.getPrice()
+//        );
+//
+//        // Send the event to Kafka
+////        kafkaProducer.sendAuctionSuccessEvent(event);
+//
+//        return true;
+//    }
+
+//    public void sendAuctionSuccessNotification(AuctionSuccessEvent event) {
+//        Auction_Items auctionItem = auctionItemsRepository.findById(event.getProductId())
+//                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_EXISTS));
+//
+//        Bidding bidding = biddingRepository.findBiddingByAuction_Items(auctionItem);
+//
+//        User buyer = userRepository.findById(bidding.getUser().getId())
+//                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+//
+//        if (auctionItem != null) {
+//            auctionItem.setSoldout(true);
+//            auctionItem.setBuyer(buyer);
+//            auctionItemsRepository.save(auctionItem);
+//        }
+//
+//        User seller = userRepository.findById(bidding.getUser().getId())
+//                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+//        // Gửi email cho người mua
+//        SimpleMailMessage buyerMessage = new SimpleMailMessage();
+//        buyerMessage.setTo(event.getBuyerEmail());
+//        buyerMessage.setSubject("Đấu giá thành công");
+//        buyerMessage.setText("Chúc mừng bạn đã đấu giá thành công sản phẩm " + event.getItemName() + " với giá " + event.getPrice());
+//        buyerMessage.setSentDate(new Date());
+//        mailSender.send(buyerMessage);
+//
+//        // Gửi email cho người bán
+//        SimpleMailMessage sellerMessage = new SimpleMailMessage();
+//        sellerMessage.setTo(event.getSellerEmail());
+//        sellerMessage.setSubject("Chúc mừng! Sản phẩm " + event.getItemName() + " của bạn đã được đấu giá thành công");
+//        sellerMessage.setText("Sản phẩm " + event.getItemName() + " của bạn đã được khách hàng đấu giá thành công với mức giá " + event.getPrice());
+//        sellerMessage.setSentDate(new Date());
+//        mailSender.send(sellerMessage);
+//
+//        // Gửi thông báo qua WebSocket
+//        Notification notification = Notification.builder()
+//                .sellerIsRead(false)
+//                .buyerIsRead(false)
+//                .bidding(bidding)
+//                .price(bidding.getPrice())
+//                .seller(seller)
+//                .buyer(buyer)
+//                .date(new Date())
+//                .auction(true)
+//                .build();
+//
+//        notificationRepository.save(notification);
+//        NotificationResponse notificationResponse = NotificationMapper.toNotificationResponse(notification);
+//        messagingTemplate.convertAndSend("/topic/notification", notification);
+//    }
 
 }
