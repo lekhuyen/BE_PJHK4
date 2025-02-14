@@ -98,6 +98,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/blog").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/api/blog/**").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/api/blog/**").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/auction/product").permitAll()
 
 
 

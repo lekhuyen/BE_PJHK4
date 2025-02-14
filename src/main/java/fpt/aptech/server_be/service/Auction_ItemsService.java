@@ -107,6 +107,13 @@ public class Auction_ItemsService {
                 .build();
     }
 
+
+//    lay sp chua ban
+    public List<Auction_ItemsResponse> getAllAuction_ItemsBidding(){
+        List<Auction_Items> auctionItems = auction_ItemsRepository.findAllProductBidding();
+        return auctionItems.stream().map(Auction_ItemsMapper::toAuction_ItemsResponse).collect(Collectors.toList());
+    }
+
 //    get all by user
     public List<Auction_ItemsResponse> getAllByCreator(String creator) {
         User user = userRepository.findById(creator).orElseThrow(() -> new RuntimeException("User is not found"));

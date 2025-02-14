@@ -39,6 +39,14 @@ public class AuctionController {
                 .build();
     }
 
+//    lay all sp de chot phien dau gia
+    @GetMapping("/product")
+    public ApiResponse<List<Auction_ItemsResponse>> getAllAuctionsBidding(){
+        return ApiResponse.<List<Auction_ItemsResponse>>builder()
+                .result(auction_ItemsService.getAllAuction_ItemsBidding())
+                .build();
+    }
+
     @GetMapping("category/{id}")
     public ApiResponse<PageResponse<Auction_ItemsResponse>> getAuctionByCategory(@PathVariable int id,
                                  @RequestParam(value = "page", required = false,defaultValue = "1") int page,
