@@ -13,4 +13,6 @@ public class AuthenticationResponse {
     boolean authenticated;
     private String username; // ✅ Thêm trường username
     private String userId;
+    private String phone;
+    private String address;
 }

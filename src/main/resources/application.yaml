@@ -4,9 +4,11 @@ spring:
     name: server_be
   datasource:
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-    url: jdbc:sqlserver://localhost:1433;databaseName=PJHK4;TrustServerCertificate=true
+    url: jdbc:sqlserver://localhost:1433;databaseName=PJHK4;TrustServerCertificate=true;encrypt=false;sendStringParametersAsUnicode=true
     username: sa
     password: 123
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.web.servlet.HttpEncodingAutoConfiguration
   jpa:
     hibernate:
       ddl-auto: update
@@ -69,6 +71,11 @@ kafka:
   topic:
     auction:
       success: auction_success_topic
-
+server:
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
 
 

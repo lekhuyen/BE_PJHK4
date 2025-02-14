@@ -23,6 +23,8 @@ public class UserResponse {
     LocalDate dob;
     String ciNumber;
     String address;
+     String phone;
+
     boolean isActive;
     Set<RoleResponse> roles;
 
