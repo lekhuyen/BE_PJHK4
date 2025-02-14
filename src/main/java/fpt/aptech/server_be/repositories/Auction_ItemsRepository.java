@@ -39,4 +39,7 @@ public interface Auction_ItemsRepository extends JpaRepository<Auction_Items, In
     // Lấy danh sách sản phẩm chưa bán (Upcoming)
     List<Auction_Items> findByIsSellFalse();
 
+    @Query("select a from Auction_Items a where a.isSoldout = false ")
+    List<Auction_Items> findAllProductBidding();
+
 }

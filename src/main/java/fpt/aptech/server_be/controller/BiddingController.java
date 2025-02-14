@@ -1,7 +1,9 @@
 package fpt.aptech.server_be.controller;
 
 import com.cloudinary.Api;
+import fpt.aptech.server_be.configuration.RabbitConfig;
 import fpt.aptech.server_be.dto.request.ApiResponse;
+import fpt.aptech.server_be.dto.request.AuctionSuccessDTO;
 import fpt.aptech.server_be.dto.request.BiddingRequest;
 import fpt.aptech.server_be.dto.response.BiddingResponse;
 import fpt.aptech.server_be.dto.response.NotificationResponse;
@@ -11,12 +13,17 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageProperties;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -24,6 +31,9 @@ import java.util.List;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class BiddingController {
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     BiddingService biddingService;
 
@@ -85,9 +95,32 @@ public class BiddingController {
                 .build();
     }
 
+//    @PostMapping("success/{productId}/{sellerId}")
+//    public boolean auctionSuccess(@PathVariable("productId") int productId,@PathVariable("sellerId") String sellerId){
+//        return biddingService.auctionSuccess(productId,sellerId);
+//    }
+
+
     @PostMapping("success/{productId}/{sellerId}")
-    public boolean auctionSuccess(@PathVariable("productId") int productId,@PathVariable("sellerId") String sellerId){
-        return biddingService.auctionSuccess(productId,sellerId);
+    public boolean   auctionSuccess(@PathVariable("productId") int productId,@PathVariable("sellerId") String sellerId){
+        String correlationId = UUID.randomUUID().toString();
+
+        MessageProperties props = new MessageProperties();
+        props.setCorrelationId(correlationId);
+        props.setReplyTo(RabbitConfig.REPLY_QUEUE);
+
+        AuctionSuccessDTO auctionMessage = new AuctionSuccessDTO(productId, sellerId, correlationId);
+
+        Message message = rabbitTemplate.getMessageConverter().toMessage(auctionMessage, props);
+
+        rabbitTemplate.send(RabbitConfig.EXCHANGE, RabbitConfig.ROUTING_KEY, message);
+
+        Message response = rabbitTemplate.receive(RabbitConfig.REPLY_QUEUE, 5000);
+        if (response != null) {
+            return (Boolean) rabbitTemplate.getMessageConverter().fromMessage(response);
+        } else {
+            return false;
+        }
     }
 
 }
