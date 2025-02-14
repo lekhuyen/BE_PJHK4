@@ -27,11 +27,13 @@ public class User {
     String id;
     String name;
     String password;
+    String phone;
 //    String firstName;
 //    String lastName;
     String email;
     LocalDate dob;
     String ciNumber;
+    @Column(name = "address", columnDefinition = "NVARCHAR(255) COLLATE Vietnamese_CI_AS")
     String address;
     Boolean isActive = true;
     Date createdAt = new Date();
