@@ -12,14 +12,19 @@ import fpt.aptech.server_be.exception.ErrorCode;
 import fpt.aptech.server_be.mapper.UserMapper;
 import fpt.aptech.server_be.repositories.RoleRepository;
 import fpt.aptech.server_be.repositories.UserRepository;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import net.sourceforge.tess4j.Tesseract;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,10 +32,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -41,6 +44,11 @@ public class UserService {
     UserRepository userRepository;
     PasswordEncoder passwordEncoder;
     RoleRepository roleRepository;
+
+    @Autowired
+    private JavaMailSender mailSender;
+
+    private final Map<String, String> otpStorage = new ConcurrentHashMap<>();
 
 
     public User createUser(UserCreationRequest request) {
@@ -63,6 +71,8 @@ public class UserService {
 
        return userRepository.save(user);
     }
+
+
 
 //    @PreAuthorize("hasRole('ADMIN')")
 //    @PreAuthorize("hasAuthority('APPROVE_POST')")
@@ -137,5 +147,56 @@ public class UserService {
             }
         }
         return false;
+    }
+
+//    lay OTP
+    public void forgotPassword(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        if(!Objects.isNull(user)) {
+            String otp = generateOTP();
+
+            otpStorage.put(email, otp);
+
+            sendOTP(email, otp);
+        }
+
+    }
+
+    public boolean verifyOTP(String email, String otp) {
+        return otpStorage.containsKey(email) && otpStorage.get(email).equals(otp);
+    }
+
+    public void resetPassword(String email, String otp, String newPassword) {
+        if (!verifyOTP(email, otp)) {
+            throw new RuntimeException("Invalid OTP");
+        }
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        otpStorage.remove(email);
+    }
+
+    public String generateOTP() {
+        Random random = new Random();
+        return String.format("%06d", random.nextInt(999999));
+    }
+
+    public void sendOTP(String toEmail, String otp) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setTo(toEmail);
+            helper.setSubject("Password Reset OTP");
+            helper.setText("Your OTP for password reset is: " + otp, true);
+
+            mailSender.send(message);
+        } catch (MessagingException e) {
+            throw new RuntimeException("Error sending email", e);
+        }
     }
 }
