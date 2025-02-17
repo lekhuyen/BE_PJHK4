@@ -76,6 +76,8 @@ public class AuthenticationService {
                 .token(token)
                 .username(user.getName())
                 .userId(user.getId())
+                .phone(user.getPhone() == null ? "" : user.getPhone())
+                .address(user.getAddress() == null ? "" : user.getAddress())
                 .authenticated(true)
                 .build();
     }
@@ -123,6 +125,8 @@ public class AuthenticationService {
                 .claim("scope", buildScope(user))
                 .claim("userid", user.getId())
                 .claim("username", user.getName())
+                .claim("phone", user.getPhone())
+                .claim("address", user.getAddress())
                 .build();
 
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());

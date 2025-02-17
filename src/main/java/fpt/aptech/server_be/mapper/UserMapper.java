@@ -22,10 +22,10 @@ public class UserMapper {
 
         user.setName(request.getName());
         user.setPassword(request.getPassword());
-//        user.setFirstName(request.getFirstName());
-//        user.setLastName(request.getLastName());
         user.setDob(request.getDob());
         user.setEmail(request.getEmail());
+        user.setPhone(request.getPhone());
+        user.setAddress(request.getAddress());
 
         return user;
     }
@@ -41,8 +41,10 @@ public class UserMapper {
         userResponse.setActive(user.getIsActive() != null ? user.getIsActive() : false);
         userResponse.setDob(user.getDob());
         userResponse.setEmail(user.getEmail());
+        userResponse.setPhone(user.getPhone());
         userResponse.setCiNumber(user.getCiNumber());
         userResponse.setAddress(user.getAddress());
+
         userResponse.setRoles(convertRoles(user.getRoles()) != null ? convertRoles(user.getRoles()) : new HashSet<>());
         return userResponse;
     }

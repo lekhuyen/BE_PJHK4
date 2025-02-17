@@ -30,6 +30,9 @@ public interface Auction_ItemsRepository extends JpaRepository<Auction_Items, In
     @Query("select a from Auction_Items a where a.user= :user")
     List<Auction_Items> findAllByUser(@Param("user") User user);
 
+//    @Query("select a from Auction_Items a where a.user= :user and a.status = true")
+//    List<Auction_Items> findAllByCreator(@Param("user") User user);
+
     @Query("select a from Auction_Items a where a.buyer= :buyer")
     List<Auction_Items> findAllBuyer(@Param("buyer") User buyer);
 
@@ -38,5 +41,8 @@ public interface Auction_ItemsRepository extends JpaRepository<Auction_Items, In
 
     // Lấy danh sách sản phẩm chưa bán (Upcoming)
     List<Auction_Items> findByIsSellFalse();
+
+    @Query("select a from Auction_Items a where a.isSoldout = false ")
+    List<Auction_Items> findAllProductBidding();
 
 }
