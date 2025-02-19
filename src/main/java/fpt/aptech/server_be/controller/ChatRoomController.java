@@ -50,6 +50,7 @@ public class ChatRoomController {
     public ChatRoomResponse createOrJoinRoom(@PathVariable int productId,
                                      @RequestBody Map<String, String> requestBody) {
         String buyerId = requestBody.get("buyerId");
+        System.out.println("Received message buyerId-----: " + buyerId);
         if (buyerId == null) {
             throw new RuntimeException("Buyer ID is missing");
         }
@@ -88,6 +89,8 @@ public class ChatRoomController {
 //
 //    messagingTemplate.convertAndSend("/topic/room/" + messageRequest.getRoomId(), message);
 //}
+
+//mo sau
     @PostMapping(value = "/send-message",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 public ChatMessResponse sendMessages(@ModelAttribute ChatMessageRequest messageRequest) throws JsonProcessingException {
         System.out.println("Received message: " + messageRequest.toString());
@@ -105,11 +108,27 @@ public ChatMessResponse sendMessages(@ModelAttribute ChatMessageRequest messageR
 
 }
 
+//    @PostMapping(value = "/send-message", consumes = MediaType.APPLICATION_JSON_VALUE)
+//    public ChatMessResponse sendMessages(@RequestBody ChatMessageRequest messageRequest) throws JsonProcessingException {
+//        System.out.println("Received message: " + messageRequest.toString());
+//        log.info("📩 Nhận tin nhắn: {}", messageRequest);
+//        ChatRoom chatRoom = chatRoomRepository.findById(messageRequest.getRoomId())
+//                .orElseThrow(() -> new RuntimeException("Chat room not found"));
+//
+//        return chatMessageService.sendMessage(
+//                chatRoom,
+//                messageRequest.getSender(),
+//                messageRequest.getContent(),
+//                messageRequest.getImages()
+//        );
+//    }
+
+
 
     @MessageMapping("/sendMessage")
 //    @SendTo("/topic/messages")
     public void sendMessage(ChatMessageRequest chatMessageRequest) throws JsonProcessingException {
-//        System.out.println("Received message: " + chatMessageRequest.toString());
+        System.out.println("Received message: " + chatMessageRequest.toString());
         ChatRoom chatRoom = chatRoomRepository.findById(chatMessageRequest.getRoomId())
             .orElseThrow(() -> new RuntimeException("Chat room not found"));
 
