@@ -40,7 +40,7 @@ public class ChatRoomService {
              chatRoomRepository.save(chatRoom);
         return ChatRoomMapper.toChatRoomResponse(chatRoom);
         }
-        return null;
+        return ChatRoomMapper.toChatRoomResponse(chatRoom);
     }
 
     public List<ChatRoomResponse> getAllChatRooms(String userId) {
