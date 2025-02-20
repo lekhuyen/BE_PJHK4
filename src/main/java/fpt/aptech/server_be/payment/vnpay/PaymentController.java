@@ -9,12 +9,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/v1/payment") // Đổi trực tiếp thành đường dẫn cố định
 @RequiredArgsConstructor
@@ -50,6 +51,54 @@ public class PaymentController {
         String redirectUrl = String.format("http://localhost:3000/manager-post");
 
         response.sendRedirect(redirectUrl);
+    }
+
+    @GetMapping("/vn-pay-callback-mobile")
+    public void payCallbackHandlerMobile(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String status = request.getParameter("vnp_ResponseCode");
+        String orderInfo = request.getParameter("vnp_OrderInfo");
+        String productId = orderInfo.replace("Thanh toán cho sản phẩm ID: ", ""); // Lọc productId
+
+        log.info("✅ Thanh toán thành công - productId: {}", productId);
+
+        Auction_Items auctionItems = auction_ItemsRepository.findById(Integer.parseInt(productId)).get();
+        auctionItems.setSoldout(true);
+        auctionItems.setPaid(true);
+        auction_ItemsRepository.save(auctionItems);
+
+
+        String redirectUrl = String.format("http://localhost:3000/manager-post");
+
+        response.sendRedirect(redirectUrl);
+    }
+
+//    mobile
+@GetMapping("/bids/{userId}")
+public Map<String, List<Auction_Items>> getBidsByUser(@PathVariable String userId) {
+    log.info("📢 Truy vấn danh sách đấu giá cho userId: {}", userId);
+    List<Auction_Items> paidItems = auction_ItemsRepository.findPaidItemsByUserId(userId);
+    List<Auction_Items> unpaidItems = auction_ItemsRepository.findUnpaidItemsByUserId(userId);
+
+    Map<String, List<Auction_Items>> result = new HashMap<>();
+    result.put("paid", paidItems);
+    result.put("unpaid", unpaidItems);
+    log.info("✅ Đã tìm thấy {} sản phẩm đã thanh toán", paidItems.size());
+    log.info("✅ Đã tìm thấy {} sản phẩm chưa thanh toán", unpaidItems.size());
+    return Map.of("paid", paidItems, "unpaid", unpaidItems);
+}
+
+    @GetMapping("/won-items/{userId}")
+    public ResponseObject<List<Auction_Items>> getWonItemsByUser(@PathVariable String userId) {
+        log.info("✅ Lấy danh sách sản phẩm user đã thanh toán - userId: {}", userId);
+
+        List<Auction_Items> wonItems = auction_ItemsRepository.findWonItemsByUserId(userId);
+        // 🔥 Loại bỏ dữ liệu gây lỗi trước khi trả về JSON
+        wonItems.forEach(item -> {
+            if (item.getBuyer() != null) {
+                item.getBuyer().setAuctionItems(null); // ✅ Ngăn Buyer trả về danh sách auctionItems
+            }
+        });
+        return new ResponseObject<>(HttpStatus.OK, "Success", wonItems);
     }
 
 }

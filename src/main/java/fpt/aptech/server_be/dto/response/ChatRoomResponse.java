@@ -23,6 +23,5 @@ public class ChatRoomResponse {
     List<String> images;
     ChatMessResponse message;
 
-
     NotificationChatResponse notification;
 }

@@ -22,9 +22,9 @@ public class ChatMessageRequest {
     String content;
     String sender;
     @Nullable
-    List<MultipartFile> images;
+    List<MultipartFile> images = new ArrayList<>();
     @Nullable
-    List<String> imagess;
+    List<String> imagess = new ArrayList<>();
     Date timestamp = new Date();
 
 }

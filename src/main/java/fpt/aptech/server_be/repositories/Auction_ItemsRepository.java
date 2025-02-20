@@ -45,4 +45,14 @@ public interface Auction_ItemsRepository extends JpaRepository<Auction_Items, In
     @Query("select a from Auction_Items a where a.isSoldout = false ")
     List<Auction_Items> findAllProductBidding();
 
+
+    @Query("SELECT a FROM Auction_Items a WHERE a.user.id = :userId AND a.isPaid = true")
+    List<Auction_Items> findPaidItemsByUserId(@Param("userId") String userId);
+
+    @Query("SELECT a FROM Auction_Items a WHERE a.user.id = :userId AND a.isPaid = false")
+    List<Auction_Items> findUnpaidItemsByUserId(@Param("userId") String userId);
+
+    @Query("SELECT a FROM Auction_Items a WHERE a.buyer.id = :userId AND a.isPaid = true")
+    List<Auction_Items> findWonItemsByUserId(@Param("userId") String userId);
+
 }

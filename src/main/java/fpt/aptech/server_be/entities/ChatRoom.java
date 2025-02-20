@@ -37,7 +37,7 @@ public class ChatRoom {
     private User seller;
 
 
-    @OneToOne
+    @OneToOne(mappedBy = "chatroom", cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "notification")
     private NotificationChat notificationChat;
 
