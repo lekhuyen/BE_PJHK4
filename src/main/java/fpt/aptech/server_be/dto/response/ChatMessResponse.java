@@ -26,4 +26,5 @@ public class ChatMessResponse {
     Date timestamp;
     @Nullable
     List<String> images;
+
 }
