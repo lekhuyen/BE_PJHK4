@@ -1,11 +1,14 @@
 package fpt.aptech.server_be.mapper;
 
+import fpt.aptech.server_be.dto.response.ChatMessResponse;
+import fpt.aptech.server_be.dto.response.ChatMessageResponse;
 import fpt.aptech.server_be.dto.response.ChatRoomResponse;
 import fpt.aptech.server_be.dto.response.NotificationChatResponse;
 import fpt.aptech.server_be.entities.ChatMessage;
 import fpt.aptech.server_be.entities.ChatRoom;
 import org.mapstruct.Mapper;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Mapper
@@ -23,14 +26,21 @@ public class ChatRoomMapper {
         response.setImages(request.getAcAuctionItem().getImages());
 
 
+        if (request.getMessage() != null) {
+            List<ChatMessResponse> messages = request.getMessage()
+                    .stream()
+                    .map(ChatMessageMapper::toChatMessageResponse)
+                    .toList();
+            response.setListMessages(messages);
+        }
+
+
         if (request.getMessage() != null && !request.getMessage().isEmpty()) {
             ChatMessage message = request.getMessage()
                     .stream()
                     .reduce((first, second) -> second)
                     .orElse(null);
-            if (message != null) {
-                response.setMessage(ChatMessageMapper.toChatMessageResponse(message));
-            }
+            response.setMessage(ChatMessageMapper.toChatMessageResponse(message));
         }
 
         NotificationChatResponse notificationChatResponse = new NotificationChatResponse();

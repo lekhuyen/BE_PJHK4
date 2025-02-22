@@ -157,6 +157,7 @@ public class AuthenticationService {
         }
         return IntrospectResponse.builder()
                 .valid(isValid)
+                .token(token)
                 .build();
     }
 

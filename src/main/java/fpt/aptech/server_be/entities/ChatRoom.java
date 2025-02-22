@@ -29,7 +29,7 @@ public class ChatRoom {
     @JoinColumn(name = "buyer_id", nullable = false)
     private User buyer;
 
-    @OneToMany(mappedBy = "chatRoom")
+    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChatMessage> message;
 
     @ManyToOne
