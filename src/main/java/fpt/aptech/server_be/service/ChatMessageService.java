@@ -118,6 +118,8 @@ public class ChatMessageService {
         int quantityContent = !content.isEmpty() ? 1 : 0;
         int quantityImage = fileNames.size();
 
+
+
         NotificationChat notificationChat = notificationChatRepository.findNotificationByChatRom(chatRoom);
         if (notificationChat != null) {
             if(Objects.equals(notificationChat.getSellerId(), sender)){
@@ -144,7 +146,9 @@ public class ChatMessageService {
         chatRoomRepository.save(chatRoom);
 
         NotificationChatResponse chatResponse = new NotificationChatResponse();
-        chatResponse.setNotiId(notificationChat.getId());
+        if (notificationChat != null) {
+            chatResponse.setNotiId(notificationChat.getId());
+        }
         chatResponse.setQuantitySeller(notificationChat.getQuantitySeller());
         chatResponse.setQuantityBuyer(notificationChat.getQuantityBuyer());
         chatResponse.setBuyerId(notificationChat.getBuyerId());

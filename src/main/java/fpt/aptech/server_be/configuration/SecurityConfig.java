@@ -98,6 +98,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/blog").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/api/blog/**").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/api/blog/**").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/auction/product").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/users/forgot-password").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/users/verify-otp").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/users/reset-password").permitAll()
 
 
 

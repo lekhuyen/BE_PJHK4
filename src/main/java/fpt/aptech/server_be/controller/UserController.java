@@ -115,4 +115,22 @@ public class UserController {
                 .build();
     }
 
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(@RequestParam String email) {
+        userService.forgotPassword(email);
+        return ResponseEntity.ok("OTP has been sent to your email");
+    }
+
+
+    @PostMapping("/verify-otp")
+    public ResponseEntity<String> verifyOTP(@RequestParam String email, @RequestParam String otp) {
+        boolean isValid = userService.verifyOTP(email, otp);
+        return isValid ? ResponseEntity.ok("OTP is valid") : ResponseEntity.badRequest().body("Invalid OTP");
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestParam String email, @RequestParam String otp, @RequestParam String newPassword) {
+        userService.resetPassword(email, otp, newPassword);
+        return ResponseEntity.ok("Password has been reset successfully");
+    }
 }

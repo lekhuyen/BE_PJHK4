@@ -74,6 +74,10 @@ public class AuthenticationService {
         var token = generateToken(user);
         return AuthenticationResponse.builder()
                 .token(token)
+                .username(user.getName())
+                .userId(user.getId())
+                .phone(user.getPhone() == null ? "" : user.getPhone())
+                .address(user.getAddress() == null ? "" : user.getAddress())
                 .authenticated(true)
                 .build();
     }
@@ -121,6 +125,8 @@ public class AuthenticationService {
                 .claim("scope", buildScope(user))
                 .claim("userid", user.getId())
                 .claim("username", user.getName())
+                .claim("phone", user.getPhone())
+                .claim("address", user.getAddress())
                 .build();
 
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
@@ -151,6 +157,7 @@ public class AuthenticationService {
         }
         return IntrospectResponse.builder()
                 .valid(isValid)
+                .token(token)
                 .build();
     }
 

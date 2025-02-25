@@ -4,9 +4,11 @@ spring:
     name: server_be
   datasource:
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-    url: jdbc:sqlserver://localhost:1433;databaseName=PJHK4;TrustServerCertificate=true
+    url: jdbc:sqlserver://localhost:1433;databaseName=PJHK4;TrustServerCertificate=true;encrypt=false;sendStringParametersAsUnicode=true
     username: sa
     password: 123
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.web.servlet.HttpEncodingAutoConfiguration
   jpa:
     hibernate:
       ddl-auto: update
@@ -33,6 +35,16 @@ spring:
           auth: true
           starttls:
             enable: true
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: auction-consumer-group
+      enable-auto-commit: true
+      auto-offset-reset: earliest
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
 
 jwt:
   signerKey: "pDozQy8Ihk/phzNwDBNzRmuWvnA6YkDg/D1mmO4FpejrQJ3kVTf10AcELK1qJnGW"
@@ -55,6 +67,15 @@ payment:
     orderType: other
 
 
-
+kafka:
+  topic:
+    auction:
+      success: auction_success_topic
+server:
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
 
 

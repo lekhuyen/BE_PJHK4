@@ -1,6 +1,9 @@
 package fpt.aptech.server_be.entities;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
@@ -28,11 +31,20 @@ public class Auction_Items {
     String description;
     Double starting_price;
     Double current_price;
+//    LocalDate start_date;
+//    LocalDate end_date;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     LocalDate start_date;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     LocalDate end_date;
     String bid_step;
 
-    @OneToOne(mappedBy = "auction_Items", cascade = CascadeType.ALL)
+//    @OneToOne(mappedBy = "auction_Items", cascade = CascadeType.ALL)
+//    Bidding bidding;
+
+    @OneToOne(mappedBy = "auction_Items", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @JsonBackReference
     Bidding bidding;
 
     boolean isSell;
@@ -60,15 +72,21 @@ public class Auction_Items {
 //    its creator
     @ManyToOne
     @JoinColumn(name = "seller_Id", referencedColumnName = "id")
+//    them
+    @JsonBackReference
     User user;
 
     @ManyToOne
     @JoinColumn(name = "buyer_Id", referencedColumnName = "id")
+//    them
+    @JsonIgnore
     User buyer;
 
     // Many-to-one relationship with Category
     @ManyToOne
     @JoinColumn(name = "categoryId", referencedColumnName = "category_id")
+//    them
+    @JsonBackReference
     Category category;
 
     @OneToMany(mappedBy = "acAuctionItem", cascade = CascadeType.ALL, orphanRemoval = true)

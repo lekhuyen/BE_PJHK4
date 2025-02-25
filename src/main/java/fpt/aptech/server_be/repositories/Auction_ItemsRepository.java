@@ -30,7 +30,29 @@ public interface Auction_ItemsRepository extends JpaRepository<Auction_Items, In
     @Query("select a from Auction_Items a where a.user= :user")
     List<Auction_Items> findAllByUser(@Param("user") User user);
 
+//    @Query("select a from Auction_Items a where a.user= :user and a.status = true")
+//    List<Auction_Items> findAllByCreator(@Param("user") User user);
+
     @Query("select a from Auction_Items a where a.buyer= :buyer")
     List<Auction_Items> findAllBuyer(@Param("buyer") User buyer);
+
+    // Lấy danh sách sản phẩm đã bán (Featured)
+    List<Auction_Items> findByIsSellTrue();
+
+    // Lấy danh sách sản phẩm chưa bán (Upcoming)
+    List<Auction_Items> findByIsSellFalse();
+
+    @Query("select a from Auction_Items a where a.isSoldout = false ")
+    List<Auction_Items> findAllProductBidding();
+
+
+    @Query("SELECT a FROM Auction_Items a WHERE a.user.id = :userId AND a.isPaid = true")
+    List<Auction_Items> findPaidItemsByUserId(@Param("userId") String userId);
+
+    @Query("SELECT a FROM Auction_Items a WHERE a.user.id = :userId AND a.isPaid = false")
+    List<Auction_Items> findUnpaidItemsByUserId(@Param("userId") String userId);
+
+    @Query("SELECT a FROM Auction_Items a WHERE a.buyer.id = :userId AND a.isPaid = true")
+    List<Auction_Items> findWonItemsByUserId(@Param("userId") String userId);
 
 }

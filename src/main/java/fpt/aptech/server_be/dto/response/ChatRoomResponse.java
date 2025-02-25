@@ -22,7 +22,7 @@ public class ChatRoomResponse {
     Double current_price;
     List<String> images;
     ChatMessResponse message;
-
+    List<ChatMessResponse> listMessages;
 
     NotificationChatResponse notification;
 }
