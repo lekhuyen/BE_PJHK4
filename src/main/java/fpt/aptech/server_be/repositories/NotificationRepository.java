@@ -13,7 +13,7 @@ import java.util.List;
 
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, String> {
-    @Query("SELECT b FROM Notification b WHERE b.seller = :user OR b.buyer = :user")
+    @Query("SELECT b FROM Notification b WHERE b.seller = :user OR b.buyer = :user order by b.date DESC ")
     List<Notification> findNotificationBySellerAndBuyer(@Param("user") User user);
 
     @Query("SELECT b FROM Notification b WHERE b.id = :id and (b.buyer = :user or b.seller = : user)")

@@ -95,6 +95,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/reviewitem").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/api/reviewitem/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/blog/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/chatroom/room/room/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/blog").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/api/blog/**").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/api/blog/**").permitAll()
@@ -104,6 +105,32 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/users/reset-password").permitAll()
 
 
+                        //t
+                        .requestMatchers(HttpMethod.DELETE, "/api/favorites/remove-favorite-item").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/favorites/unfollow-auctioneer").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/favorites/add-favorite-item").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/favorites/follow-auctioneer").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/favorites/get-favorite-items/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/favorites/get-followed-auctioneers/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/favorites/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/favorites/get-followers-count/{auctioneerId}").permitAll()
+
+
+                        .requestMatchers(HttpMethod.GET, "/api/v1/payment/bids/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/payment/won-items/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/payment/unwon-items/**").permitAll()
+
+
+                        .requestMatchers(HttpMethod.GET, "/api/auction/upcoming").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/auction/featured").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/auction/creator/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/auction/creator/{userId}/upcoming").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/auction/creator/{userId}/active").permitAll()
+
+
+                        .requestMatchers(HttpMethod.PUT, "/api/users/{userId}").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/users/add-address").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/users/add-address/{userId}").permitAll()
 
 
 

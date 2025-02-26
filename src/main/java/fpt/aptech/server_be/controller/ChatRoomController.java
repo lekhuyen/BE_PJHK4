@@ -15,6 +15,7 @@ import fpt.aptech.server_be.repositories.UserRepository;
 import fpt.aptech.server_be.service.ChatMessageService;
 import fpt.aptech.server_be.service.ChatRoomService;
 import fpt.aptech.server_be.service.UserService;
+import jakarta.websocket.server.PathParam;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -173,5 +174,11 @@ public ChatMessResponse sendMessages(@ModelAttribute ChatMessageRequest messageR
     public void typingNotification(TypingStatus typingStatus, @DestinationVariable String roomId) {
 
         messagingTemplate.convertAndSend("/topic/room/" + roomId + "/typing", typingStatus);
+    }
+
+
+    @GetMapping("/room/room/{chatRoomId}")
+    public ChatRoomResponse getChatRoomById(@PathVariable("chatRoomId") int chatRoomId) {
+        return chatRoomService.getRoomById(chatRoomId);
     }
 }

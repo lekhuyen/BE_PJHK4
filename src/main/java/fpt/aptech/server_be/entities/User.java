@@ -1,5 +1,6 @@
 package fpt.aptech.server_be.entities;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -64,5 +65,12 @@ public class User {
 
     @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL)
     List<NotificationAuctionItem> creatorNotifications;  // Notifications where the user is the buyer
+
+    @JsonManagedReference // ✅ Quản lý vòng lặp
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Address> addresses = new ArrayList<>(); // ✅ Danh sách địa chỉ của người dùng
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Favorite> follows = new ArrayList<>(); // ✅ Danh sách nhà đấu giá đã follow
 
 }

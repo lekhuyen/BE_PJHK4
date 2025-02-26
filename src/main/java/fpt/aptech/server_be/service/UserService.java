@@ -4,6 +4,7 @@ import fpt.aptech.server_be.dto.request.UserCreationRequest;
 import fpt.aptech.server_be.dto.request.UserUpdateRequest;
 import fpt.aptech.server_be.dto.response.PageResponse;
 import fpt.aptech.server_be.dto.response.UserResponse;
+import fpt.aptech.server_be.entities.Address;
 import fpt.aptech.server_be.entities.Auction_Items;
 import fpt.aptech.server_be.entities.User;
 import fpt.aptech.server_be.enums.Role;
@@ -198,5 +199,48 @@ public class UserService {
         } catch (MessagingException e) {
             throw new RuntimeException("Error sending email", e);
         }
+    }
+
+
+    //trường
+    public boolean addAddress(String userId, String address, String zip, String phone) {
+        User user = userRepository.findById(userId).orElse(null);
+
+        if (user == null) {
+            System.out.println("🚨 Lỗi: Không tìm thấy userId: " + userId);
+            return false;
+        }
+
+        if (address.trim().isEmpty() || zip.trim().isEmpty() || phone.trim().isEmpty()) {
+            System.out.println("🚨 Lỗi: Address, ZIP hoặc Phone không được để trống!");
+            return false;
+        }
+
+        Address newAddress = new Address();
+        newAddress.setUser(user);
+        newAddress.setAddress(address);
+        newAddress.setZip(zip);
+        newAddress.setPhone(phone);
+
+        user.getAddresses().add(newAddress);
+        userRepository.save(user);
+        return true;
+    }
+
+    public List<Address> getUserAddresses(String userId) {
+        User user = userRepository.findById(userId).orElse(null);
+
+        if (user == null) {
+            System.out.println("🚨 Lỗi: Không tìm thấy userId: " + userId);
+            return new ArrayList<>();
+        }
+
+        if (user.getAddresses() == null) {
+            System.out.println("🚨 Lỗi: Danh sách địa chỉ của user rỗng!");
+            return new ArrayList<>();
+        }
+
+        System.out.println("📢 Đang trả về danh sách địa chỉ: " + user.getAddresses().size());
+        return user.getAddresses();
     }
 }

@@ -6,6 +6,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -27,5 +28,7 @@ public class UserResponse {
 
     boolean isActive;
     Set<RoleResponse> roles;
+
+    private List<String> addresses; // ✅ Trả về danh sách địa chỉ dạng String
 
 }

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -48,5 +49,11 @@ public class ChatRoomService {
         List<ChatRoom> chatRooms = chatRoomRepository.findAllChatByBuyer(user);
 
         return chatRooms.stream().map(ChatRoomMapper::toChatRoomResponse).collect(Collectors.toList());
+    }
+
+    public ChatRoomResponse getRoomById(int roomId) {
+        Optional<ChatRoom> chatRoom = chatRoomRepository.findById(roomId);
+
+        return ChatRoomMapper.toChatRoomResponse(chatRoom.get());
     }
 }
