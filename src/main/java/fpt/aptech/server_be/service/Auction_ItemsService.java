@@ -380,4 +380,14 @@ public class Auction_ItemsService {
                 .map(Auction_ItemsMapper::toAuction_ItemsResponse)
                 .collect(Collectors.toList());
     }
+
+
+
+    //truong
+    public List<Auction_Items> findUpcomingAuctionsByCreator(String userId) {
+        return auction_ItemsRepository.findByUserIdAndIsSellFalse(userId);
+    }
+    public List<Auction_Items> findActiveAuctionsByCreator(String userId) {
+        return auction_ItemsRepository.findByUserIdAndIsSellTrue(userId);
+    }
 }
