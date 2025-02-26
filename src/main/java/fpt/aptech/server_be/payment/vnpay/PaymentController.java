@@ -92,13 +92,34 @@ public Map<String, List<Auction_Items>> getBidsByUser(@PathVariable String userI
         log.info("✅ Lấy danh sách sản phẩm user đã thanh toán - userId: {}", userId);
 
         List<Auction_Items> wonItems = auction_ItemsRepository.findWonItemsByUserId(userId);
-        // 🔥 Loại bỏ dữ liệu gây lỗi trước khi trả về JSON
+
         wonItems.forEach(item -> {
-            if (item.getBuyer() != null) {
-                item.getBuyer().setAuctionItems(null); // ✅ Ngăn Buyer trả về danh sách auctionItems
+            if (item.getUser() != null) {
+                log.info("📌 Người bán của item {}: {}", item.getItem_id(), item.getUser().getName());
+                item.getUser().setAuctionItems(null);
+            } else {
+                log.info("🚨 Item {} không có thông tin người bán!", item.getItem_id());
             }
         });
+
         return new ResponseObject<>(HttpStatus.OK, "Success", wonItems);
+    }
+    @GetMapping("/unwon-items/{userId}")
+    public ResponseObject<List<Auction_Items>> getUnwonItemsByUser(@PathVariable String userId) {
+        log.info("✅ Lấy danh sách sản phẩm chưa thanh toán - userId: {}", userId);
+
+        List<Auction_Items> unwonItems = auction_ItemsRepository.findUnWonItemsByUserId(userId);
+
+        unwonItems.forEach(item -> {
+            if (item.getUser() != null) {
+                log.info("📌 Người bán của item {}: {}", item.getItem_id(), item.getUser().getName());
+                item.getUser().setAuctionItems(null); // Xóa dữ liệu vòng lặp tránh lỗi JSON
+            } else {
+                log.info("🚨 Item {} không có thông tin người bán!", item.getItem_id());
+            }
+        });
+
+        return new ResponseObject<>(HttpStatus.OK, "Success", unwonItems);
     }
 
 }

@@ -5,12 +5,14 @@ import fpt.aptech.server_be.dto.request.ApiResponse;
 import fpt.aptech.server_be.dto.request.Auction_ItemsRequest;
 import fpt.aptech.server_be.dto.response.Auction_ItemsResponse;
 import fpt.aptech.server_be.dto.response.PageResponse;
+import fpt.aptech.server_be.entities.Auction_Items;
 import fpt.aptech.server_be.service.Auction_ItemsService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -161,5 +163,13 @@ public class AuctionController {
         return ApiResponse.<List<Auction_ItemsResponse>>builder()
                 .result(auction_ItemsService.getUpcomingAuctions())
                 .code(0).build();
+    }
+
+
+    //truong
+    @GetMapping("/creator/{userId}/upcoming")
+    public ResponseEntity<List<Auction_Items>> getUpcomingAuctionsByCreator(@PathVariable String userId) {
+        List<Auction_Items> upcomingItems = auction_ItemsService.findUpcomingAuctionsByCreator(userId);
+        return ResponseEntity.ok(upcomingItems);
     }
 }
