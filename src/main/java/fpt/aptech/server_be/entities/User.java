@@ -37,6 +37,7 @@ public class User {
     @Column(name = "address", columnDefinition = "NVARCHAR(255) COLLATE Vietnamese_CI_AS")
     String address;
     Boolean isActive = true;
+    Boolean isVerify = false;
     Date createdAt = new Date();
     Date updatedAt = new Date();
 
@@ -72,5 +73,10 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Favorite> follows = new ArrayList<>(); // ✅ Danh sách nhà đấu giá đã follow
+
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "citizen_id", referencedColumnName = "id")
+    private UserCitizen citizen;
 
 }
