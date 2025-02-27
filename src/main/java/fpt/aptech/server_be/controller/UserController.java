@@ -1,10 +1,12 @@
 package fpt.aptech.server_be.controller;
 
+import fpt.aptech.server_be.dto.request.AddressRequest;
 import fpt.aptech.server_be.dto.request.ApiResponse;
 import fpt.aptech.server_be.dto.request.UserCreationRequest;
 import fpt.aptech.server_be.dto.request.UserUpdateRequest;
 import fpt.aptech.server_be.dto.response.PageResponse;
 import fpt.aptech.server_be.dto.response.UserResponse;
+import fpt.aptech.server_be.entities.Address;
 import fpt.aptech.server_be.entities.User;
 import fpt.aptech.server_be.service.OCRService;
 import fpt.aptech.server_be.service.UserService;
@@ -132,5 +134,45 @@ public class UserController {
     public ResponseEntity<String> resetPassword(@RequestParam String email, @RequestParam String otp, @RequestParam String newPassword) {
         userService.resetPassword(email, otp, newPassword);
         return ResponseEntity.ok("Password has been reset successfully");
+    }
+
+
+
+    //truong
+    @PostMapping("/add-address")
+    public ResponseEntity<?> addAddress(@RequestBody AddressRequest request) {
+        try {
+            System.out.println("📢 Nhận request thêm địa chỉ: " + request);
+
+            if (request.getAddress().trim().isEmpty() || request.getZip().trim().isEmpty() || request.getPhone().trim().isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"error\": \"Address, ZIP hoặc Phone không được để trống\"}");
+            }
+
+            boolean success = userService.addAddress(request.getUserId(), request.getAddress(), request.getZip(), request.getPhone());
+
+            if (success) {
+                return ResponseEntity.ok().body("{\"message\": \"Address added successfully\"}");
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"error\": \"Failed to add address\"}");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"error\": \"Internal Server Error\"}");
+        }
+    }
+
+
+    @GetMapping("/address/{userId}")
+    public ResponseEntity<?> getUserAddresses(@PathVariable String userId) {
+        try {
+            List<Address> addresses = userService.getUserAddresses(userId);
+            if (addresses.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\": \"No addresses found\"}");
+            }
+            return ResponseEntity.ok(addresses);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"error\": \"Internal Server Error\"}");
+        }
     }
 }
