@@ -134,6 +134,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/users/verify-citizen").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/users/add-address/{userId}").permitAll()
 
+                        .requestMatchers(HttpMethod.GET, "/api/users/user-citizen/**").permitAll()
+
 
 
                         .requestMatchers("/ws/**").permitAll()

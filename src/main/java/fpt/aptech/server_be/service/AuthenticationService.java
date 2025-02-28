@@ -127,6 +127,7 @@ public class AuthenticationService {
                 .claim("username", user.getName())
                 .claim("phone", user.getPhone())
                 .claim("address", user.getAddress())
+                .claim("isVerify", user.getIsVerify())
                 .build();
 
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());

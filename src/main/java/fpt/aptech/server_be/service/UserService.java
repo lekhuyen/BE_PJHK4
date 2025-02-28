@@ -4,6 +4,7 @@ import fpt.aptech.server_be.dto.request.UserCitizenRequest;
 import fpt.aptech.server_be.dto.request.UserCreationRequest;
 import fpt.aptech.server_be.dto.request.UserUpdateRequest;
 import fpt.aptech.server_be.dto.response.PageResponse;
+import fpt.aptech.server_be.dto.response.UserCitizenResponse;
 import fpt.aptech.server_be.dto.response.UserResponse;
 import fpt.aptech.server_be.entities.Address;
 import fpt.aptech.server_be.entities.Auction_Items;
@@ -249,6 +250,10 @@ public class UserService {
     }
 
     public Boolean citizen(UserCitizenRequest request){
+        UserCitizen existCICode = userCitizenRepository.findByAndCiCode(request.getCiCode());
+        if(existCICode != null){
+            throw new AppException(ErrorCode.SAME_CITIZEN);
+        }
         User user = userRepository.findById(request.getUserId()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         if(user != null){
             UserCitizen userCitizen  = new UserCitizen();
@@ -267,5 +272,22 @@ public class UserService {
             return true;
         }
         return false;
+    }
+
+    public UserCitizenResponse getUserCitizenByUserId(String userId){
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        if(user != null){
+            UserCitizen userCitizen = userCitizenRepository.findByAndOrderByUser(user);
+            UserCitizenResponse userCitizenResponse = new UserCitizenResponse();
+            userCitizenResponse.setId(userCitizen.getId());
+            userCitizenResponse.setCiCode(userCitizen.getCiCode());
+            userCitizenResponse.setFullName(userCitizen.getFullName());
+            userCitizenResponse.setAddress(userCitizen.getAddress());
+            userCitizenResponse.setStartDate(userCitizen.getStartDate());
+            userCitizenResponse.setBirthDate(userCitizen.getBirthDate());
+            userCitizenResponse.setUserId(userId);
+            return userCitizenResponse;
+        }
+        return null;
     }
 }
