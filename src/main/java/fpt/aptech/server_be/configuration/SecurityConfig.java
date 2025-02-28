@@ -130,6 +130,8 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.PUT, "/api/users/{userId}").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/users/add-address").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/users/addImage/*").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/users/verify-citizen").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/users/add-address/{userId}").permitAll()
 
 
