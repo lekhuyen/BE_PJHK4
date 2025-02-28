@@ -10,11 +10,18 @@ spring:
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.web.servlet.HttpEncodingAutoConfiguration
   jpa:
+    database-platform: org.hibernate.dialect.SQLServerDialect
+
     hibernate:
       ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.SQLServerDialect
+        hibernate:
+          connection:
+            CharSet: UTF-8
+            useUnicode: true
+            characterEncoding: UTF-8
   servlet:
     multipart:
       enabled: true
