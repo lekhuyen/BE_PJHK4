@@ -29,5 +29,6 @@ public class UserResponse {
     Set<RoleResponse> roles;
 
     private List<String> addresses;
+    UserCitizenResponse citizen;
 
 }
