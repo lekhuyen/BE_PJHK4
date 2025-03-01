@@ -95,7 +95,7 @@ public class Auction_ItemsService {
         if (name != null && !name.isEmpty()) {
             auctionItemsPage = auction_ItemsRepository.findAllByItem_name(name, pageable);
         } else {
-            auctionItemsPage = auction_ItemsRepository.findAll(pageable);
+            auctionItemsPage = auction_ItemsRepository.findAllss(pageable);
         }
 
         return PageResponse.<Auction_ItemsResponse>builder()
