@@ -21,6 +21,7 @@ public class UserCitizen {
     String birthDate;
     String startDate;
 
-    @OneToOne(mappedBy = "citizen")
-    private User user;
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    User user;
 }

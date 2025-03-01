@@ -75,8 +75,7 @@ public class User {
     private List<Favorite> follows = new ArrayList<>(); // ✅ Danh sách nhà đấu giá đã follow
 
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "citizen_id", referencedColumnName = "id")
-    private UserCitizen citizen;
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "user")
+    UserCitizen citizen;
 
 }

@@ -4,6 +4,7 @@ import fpt.aptech.server_be.dto.request.UserCreationRequest;
 import fpt.aptech.server_be.dto.request.UserUpdateRequest;
 import fpt.aptech.server_be.dto.response.PermissionResponse;
 import fpt.aptech.server_be.dto.response.RoleResponse;
+import fpt.aptech.server_be.dto.response.UserCitizenResponse;
 import fpt.aptech.server_be.dto.response.UserResponse;
 import fpt.aptech.server_be.entities.Role;
 import fpt.aptech.server_be.entities.User;
@@ -44,6 +45,19 @@ public class UserMapper {
         userResponse.setPhone(user.getPhone());
         userResponse.setCiNumber(user.getCiNumber());
         userResponse.setAddress(user.getAddress());
+        userResponse.setIsVerify(user.getIsVerify() != null ? user.getIsVerify() : false);
+
+        UserCitizenResponse userCitizenResponse = new UserCitizenResponse();
+        userCitizenResponse.setId(user.getCitizen().getId());
+        userCitizenResponse.setAddress(user.getCitizen().getAddress());
+        userCitizenResponse.setCiCode(user.getCitizen().getCiCode());
+        userCitizenResponse.setFullName(user.getCitizen().getFullName());
+        userCitizenResponse.setBirthDate(user.getCitizen().getBirthDate());
+        userCitizenResponse.setStartDate(user.getCitizen().getStartDate());
+
+
+
+        userResponse.setCitizen(userCitizenResponse);
 
         userResponse.setRoles(convertRoles(user.getRoles()) != null ? convertRoles(user.getRoles()) : new HashSet<>());
         return userResponse;
