@@ -20,11 +20,15 @@ public interface Auction_ItemsRepository extends JpaRepository<Auction_Items, In
     Page<Auction_Items> findByCategory(@Param("category") Category category, Pageable pageable);
 
 
-    @Query("select a from Auction_Items a where a.item_name like %:name% and a.status = true")
+    @Query("select a from Auction_Items a where a.item_name like %:name% and a.status = true and a.isSoldout = false")
     Page<Auction_Items> findAllByItem_name(@Param("name") String name, Pageable pageable);
 
 
-    @Query("select a from Auction_Items a where a.status = true")
+    @Query("select a from Auction_Items a where a.isSoldout = false")
+    Page<Auction_Items> findAllss(Pageable pageable);
+
+
+    @Query("select a from Auction_Items a where a.status = true and a.isSoldout = false")
     Page<Auction_Items> findAllS(Pageable pageable);
 
     @Query("select a from Auction_Items a where a.user= :user")

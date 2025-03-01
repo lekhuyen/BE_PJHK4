@@ -44,6 +44,7 @@ public class UserMapper {
         userResponse.setPhone(user.getPhone());
         userResponse.setCiNumber(user.getCiNumber());
         userResponse.setAddress(user.getAddress());
+        userResponse.setIsVerify(user.getIsVerify() != null ? user.getIsVerify() : false);
 
         userResponse.setRoles(convertRoles(user.getRoles()) != null ? convertRoles(user.getRoles()) : new HashSet<>());
         return userResponse;
