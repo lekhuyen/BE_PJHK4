@@ -18,17 +18,16 @@ import java.util.Set;
 public class UserResponse {
     String id;
     String name;
-//    String firstName;
-//    String lastName;
     String email;
     LocalDate dob;
     String ciNumber;
     String address;
-     String phone;
+    String phone;
+    Boolean isVerify;
 
     boolean isActive;
     Set<RoleResponse> roles;
 
-    private List<String> addresses; // ✅ Trả về danh sách địa chỉ dạng String
+    private List<String> addresses;
 
 }

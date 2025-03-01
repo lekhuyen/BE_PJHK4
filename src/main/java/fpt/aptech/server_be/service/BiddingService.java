@@ -186,8 +186,8 @@ public class BiddingService {
         }
     }
 
-    //dau gia thanh cong
-//    public boolean auctionSuccess(int productId,String sellerId){
+//    dau gia thanh cong
+//    public boolean auctionSuccesss(int productId,String sellerId){
 //        Auction_Items auctionItem = auctionItemsRepository.findById(productId)
 //                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_EXISTS));
 //
@@ -286,8 +286,6 @@ public class BiddingService {
 
             sendAuctionSuccessEmails(buyer, seller, auctionItem, bidding);
         }
-
-
 
 
         return true;

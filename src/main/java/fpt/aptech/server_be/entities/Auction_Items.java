@@ -43,7 +43,7 @@ public class Auction_Items {
 //    @OneToOne(mappedBy = "auction_Items", cascade = CascadeType.ALL)
 //    Bidding bidding;
 
-    @OneToOne(mappedBy = "auction_Items", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "auction_Items", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
     @JsonBackReference
     Bidding bidding;
 
