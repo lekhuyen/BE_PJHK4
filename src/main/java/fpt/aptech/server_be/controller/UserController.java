@@ -1,16 +1,15 @@
 package fpt.aptech.server_be.controller;
 
-import fpt.aptech.server_be.dto.request.AddressRequest;
-import fpt.aptech.server_be.dto.request.ApiResponse;
-import fpt.aptech.server_be.dto.request.UserCreationRequest;
-import fpt.aptech.server_be.dto.request.UserUpdateRequest;
+import fpt.aptech.server_be.dto.request.*;
 import fpt.aptech.server_be.dto.response.PageResponse;
+import fpt.aptech.server_be.dto.response.UserCitizenResponse;
 import fpt.aptech.server_be.dto.response.UserResponse;
 import fpt.aptech.server_be.entities.Address;
 import fpt.aptech.server_be.entities.User;
 import fpt.aptech.server_be.service.OCRService;
 import fpt.aptech.server_be.service.UserService;
 import jakarta.validation.Valid;
+import jakarta.websocket.server.PathParam;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -174,5 +173,23 @@ public class UserController {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"error\": \"Internal Server Error\"}");
         }
+    }
+
+    @PostMapping("/verify-citizen")
+    ApiResponse<Boolean> verifyCitizen(@RequestBody UserCitizenRequest request) {
+
+        return ApiResponse.<Boolean>builder()
+                .message("Verify successfully")
+               .result(userService.citizen(request))
+                .build();
+    }
+
+    @GetMapping("/user-citizen/{userId}")
+    ApiResponse<UserCitizenResponse> getUserCitizenByUser(@PathVariable("userId") String userId) {
+
+        return ApiResponse.<UserCitizenResponse>builder()
+                .message("Get successfully")
+                .result(userService.getUserCitizenByUserId(userId))
+                .build();
     }
 }

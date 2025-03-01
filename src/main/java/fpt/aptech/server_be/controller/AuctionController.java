@@ -33,7 +33,7 @@ public class AuctionController {
     @GetMapping
     public ApiResponse<PageResponse<Auction_ItemsResponse>> getAllAuctions(
             @RequestParam(value = "page", required = false,defaultValue = "1") int page,
-            @RequestParam(value = "size", required = false,defaultValue = "3") int size,
+            @RequestParam(value = "size", required = false,defaultValue = "10") int size,
             @RequestParam(value = "name", required = false) String name
     ) {
         return ApiResponse.<PageResponse<Auction_ItemsResponse>>builder()
@@ -52,7 +52,7 @@ public class AuctionController {
     @GetMapping("category/{id}")
     public ApiResponse<PageResponse<Auction_ItemsResponse>> getAuctionByCategory(@PathVariable int id,
                                  @RequestParam(value = "page", required = false,defaultValue = "1") int page,
-                                  @RequestParam(value = "size", required = false,defaultValue = "3") int size) {
+                                  @RequestParam(value = "size", required = false,defaultValue = "10") int size) {
         PageResponse<Auction_ItemsResponse> response = auction_ItemsService.getAuctionItemByCategory(id, page, size);
         return ApiResponse.<PageResponse<Auction_ItemsResponse>> builder()
                 .result(response)

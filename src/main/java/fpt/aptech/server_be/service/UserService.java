@@ -1,17 +1,21 @@
 package fpt.aptech.server_be.service;
 
+import fpt.aptech.server_be.dto.request.UserCitizenRequest;
 import fpt.aptech.server_be.dto.request.UserCreationRequest;
 import fpt.aptech.server_be.dto.request.UserUpdateRequest;
 import fpt.aptech.server_be.dto.response.PageResponse;
+import fpt.aptech.server_be.dto.response.UserCitizenResponse;
 import fpt.aptech.server_be.dto.response.UserResponse;
 import fpt.aptech.server_be.entities.Address;
 import fpt.aptech.server_be.entities.Auction_Items;
 import fpt.aptech.server_be.entities.User;
+import fpt.aptech.server_be.entities.UserCitizen;
 import fpt.aptech.server_be.enums.Role;
 import fpt.aptech.server_be.exception.AppException;
 import fpt.aptech.server_be.exception.ErrorCode;
 import fpt.aptech.server_be.mapper.UserMapper;
 import fpt.aptech.server_be.repositories.RoleRepository;
+import fpt.aptech.server_be.repositories.UserCitizenRepository;
 import fpt.aptech.server_be.repositories.UserRepository;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -45,6 +49,7 @@ public class UserService {
     UserRepository userRepository;
     PasswordEncoder passwordEncoder;
     RoleRepository roleRepository;
+    UserCitizenRepository userCitizenRepository;
 
     @Autowired
     private JavaMailSender mailSender;
@@ -242,5 +247,47 @@ public class UserService {
 
         System.out.println("📢 Đang trả về danh sách địa chỉ: " + user.getAddresses().size());
         return user.getAddresses();
+    }
+
+    public Boolean citizen(UserCitizenRequest request){
+        UserCitizen existCICode = userCitizenRepository.findByAndCiCode(request.getCiCode());
+        if(existCICode != null){
+            throw new AppException(ErrorCode.SAME_CITIZEN);
+        }
+        User user = userRepository.findById(request.getUserId()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        if(user != null){
+            UserCitizen userCitizen  = new UserCitizen();
+            userCitizen.setCiCode(request.getCiCode());
+            userCitizen.setFullName(request.getFullName());
+            userCitizen.setAddress(request.getAddress());
+            userCitizen.setStartDate(request.getStartDate());
+            userCitizen.setBirthDate(request.getBirthDate());
+            userCitizen.setUser(user);
+
+            user.setIsVerify(true);
+            userCitizenRepository.save(userCitizen);
+            userRepository.save(user);
+
+
+            return true;
+        }
+        return false;
+    }
+
+    public UserCitizenResponse getUserCitizenByUserId(String userId){
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        if(user != null){
+            UserCitizen userCitizen = userCitizenRepository.findByAndOrderByUser(user);
+            UserCitizenResponse userCitizenResponse = new UserCitizenResponse();
+            userCitizenResponse.setId(userCitizen.getId());
+            userCitizenResponse.setCiCode(userCitizen.getCiCode());
+            userCitizenResponse.setFullName(userCitizen.getFullName());
+            userCitizenResponse.setAddress(userCitizen.getAddress());
+            userCitizenResponse.setStartDate(userCitizen.getStartDate());
+            userCitizenResponse.setBirthDate(userCitizen.getBirthDate());
+            userCitizenResponse.setUserId(userId);
+            return userCitizenResponse;
+        }
+        return null;
     }
 }
