@@ -48,16 +48,16 @@ public class UserMapper {
         userResponse.setIsVerify(user.getIsVerify() != null ? user.getIsVerify() : false);
 
         UserCitizenResponse userCitizenResponse = new UserCitizenResponse();
-        userCitizenResponse.setId(user.getCitizen().getId());
-        userCitizenResponse.setAddress(user.getCitizen().getAddress());
-        userCitizenResponse.setCiCode(user.getCitizen().getCiCode());
-        userCitizenResponse.setFullName(user.getCitizen().getFullName());
-        userCitizenResponse.setBirthDate(user.getCitizen().getBirthDate());
-        userCitizenResponse.setStartDate(user.getCitizen().getStartDate());
+        if(user.getCitizen() != null){
+            userCitizenResponse.setId(user.getCitizen().getId());
+            userCitizenResponse.setAddress(user.getCitizen().getAddress());
+            userCitizenResponse.setCiCode(user.getCitizen().getCiCode());
+            userCitizenResponse.setFullName(user.getCitizen().getFullName());
+            userCitizenResponse.setBirthDate(user.getCitizen().getBirthDate());
+            userCitizenResponse.setStartDate(user.getCitizen().getStartDate());
 
-
-
-        userResponse.setCitizen(userCitizenResponse);
+            userResponse.setCitizen(userCitizenResponse);
+        }
 
         userResponse.setRoles(convertRoles(user.getRoles()) != null ? convertRoles(user.getRoles()) : new HashSet<>());
         return userResponse;
