@@ -23,4 +23,6 @@ public class UserCreationRequest {
     String address;
     @Builder.Default
     List<String> roles = List.of("USER");
+
+    Double money;
 }

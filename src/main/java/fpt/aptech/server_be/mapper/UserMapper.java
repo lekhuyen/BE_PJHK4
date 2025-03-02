@@ -27,6 +27,7 @@ public class UserMapper {
         user.setEmail(request.getEmail());
         user.setPhone(request.getPhone());
         user.setAddress(request.getAddress());
+        user.setMoney(request.getMoney());
 
         return user;
     }
