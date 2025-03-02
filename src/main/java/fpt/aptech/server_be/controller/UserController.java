@@ -6,6 +6,7 @@ import fpt.aptech.server_be.dto.response.UserCitizenResponse;
 import fpt.aptech.server_be.dto.response.UserResponse;
 import fpt.aptech.server_be.entities.Address;
 import fpt.aptech.server_be.entities.User;
+import fpt.aptech.server_be.repositories.UserRepository;
 import fpt.aptech.server_be.service.OCRService;
 import fpt.aptech.server_be.service.UserService;
 import jakarta.validation.Valid;
@@ -23,7 +24,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -34,6 +38,7 @@ public class UserController {
 
     UserService userService;
     OCRService ocrService;
+    private final UserRepository userRepository;
 
     @PostMapping("/addImage/{userId}")
 //    ResponseEntity<String>
@@ -138,6 +143,7 @@ public class UserController {
 
 
     //truong
+    //truong
     @PostMapping("/add-address")
     public ResponseEntity<?> addAddress(@RequestBody AddressRequest request) {
         try {
@@ -160,7 +166,6 @@ public class UserController {
         }
     }
 
-
     @GetMapping("/address/{userId}")
     public ResponseEntity<?> getUserAddresses(@PathVariable String userId) {
         try {
@@ -172,6 +177,33 @@ public class UserController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"error\": \"Internal Server Error\"}");
+        }
+    }
+
+    @DeleteMapping("/delete/{userId}/{id}")
+    public ResponseEntity<?> deleteAddress(@PathVariable String userId, @PathVariable int id) {
+        try {
+            boolean isDeleted = userService.deleteAddress(userId, id);
+            if (isDeleted) {
+                return ResponseEntity.ok("{\"message\": \"Address deleted successfully\"}");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\": \"Address not found\"}");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"error\": \"Internal Server Error\"}");
+        }
+    }
+
+    @GetMapping("/{userId}/money")
+    public ResponseEntity<Map<String, Double>> getUserMoney(@PathVariable String userId) {
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isPresent()) {
+            Map<String, Double> response = new HashMap<>();
+            response.put("money", user.get().getMoney());
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
 

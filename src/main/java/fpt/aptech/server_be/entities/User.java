@@ -44,6 +44,8 @@ public class User {
 //    @OneToOne(mappedBy = "user")
 //    Bidding bidding;
 
+    Double money = 0.0;
+
 
     @OneToMany(mappedBy = "user")
     List<Bidding> biddings;
