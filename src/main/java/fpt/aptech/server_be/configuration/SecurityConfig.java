@@ -123,7 +123,7 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.GET, "/api/auction/upcoming").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/auction/featured").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/auction/creator/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/auction/category/{userId}").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/auction/creator/{userId}/upcoming").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/auction/creator/{userId}/active").permitAll()
 

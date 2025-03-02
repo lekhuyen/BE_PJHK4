@@ -3,6 +3,7 @@ package fpt.aptech.server_be.entities;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.Cascade;
 
 import java.util.Date;
 import java.util.List;
@@ -25,6 +26,7 @@ public class ChatMessage {
     @ElementCollection
     @CollectionTable(name = "chat_images", joinColumns = @JoinColumn(name = "images_id"))
     @Column(name = "images_name")
+    @Cascade(org.hibernate.annotations.CascadeType.ALL)
      List<String> images;
 
     @ManyToOne
