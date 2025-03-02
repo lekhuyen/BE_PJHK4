@@ -137,6 +137,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/users/user-citizen/**").permitAll()
 
 
+                        .requestMatchers(HttpMethod.DELETE, "/api/users/delete/{userId}/{id}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/favorites/get-followers-count/{auctioneerId}").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/users/{userId}/money").permitAll()
 
                         .requestMatchers("/ws/**").permitAll()
 
