@@ -79,6 +79,7 @@ public class AuthenticationService {
                 .phone(user.getPhone() == null ? "" : user.getPhone())
                 .address(user.getAddress() == null ? "" : user.getAddress())
                 .authenticated(true)
+                .money(user.getMoney())
                 .build();
     }
 
@@ -128,6 +129,7 @@ public class AuthenticationService {
                 .claim("phone", user.getPhone())
                 .claim("address", user.getAddress())
                 .claim("isVerify", user.getIsVerify())
+                .claim("money", user.getMoney())
                 .build();
 
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());

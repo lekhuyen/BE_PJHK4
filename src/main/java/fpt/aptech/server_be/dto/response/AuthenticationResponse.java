@@ -15,4 +15,5 @@ public class AuthenticationResponse {
     private String userId;
     private String phone;
     private String address;
+    private double money;
 }

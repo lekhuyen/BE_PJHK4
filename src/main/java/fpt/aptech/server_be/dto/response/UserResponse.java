@@ -31,4 +31,6 @@ public class UserResponse {
     private List<String> addresses;
     UserCitizenResponse citizen;
 
+    double money;
+
 }
