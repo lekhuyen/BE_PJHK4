@@ -287,7 +287,6 @@ public class BiddingService {
             sendAuctionSuccessEmails(buyer, seller, auctionItem, bidding);
         }
 
-
         return true;
 
     }

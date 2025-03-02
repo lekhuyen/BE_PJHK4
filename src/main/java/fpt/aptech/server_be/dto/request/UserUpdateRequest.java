@@ -19,4 +19,6 @@ public class UserUpdateRequest {
     String email;
     LocalDate dob;
     List<String> roles;
+
+    Double money;
 }

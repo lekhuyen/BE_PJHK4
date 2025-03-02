@@ -57,6 +57,7 @@ public class UserService {
     private final Map<String, String> otpStorage = new ConcurrentHashMap<>();
 
 
+
     public User createUser(UserCreationRequest request) {
 
         if(userRepository.existsByEmail(request.getEmail())) {
@@ -208,6 +209,7 @@ public class UserService {
 
 
     //trường
+    //trường
     public boolean addAddress(String userId, String address, String zip, String phone) {
         User user = userRepository.findById(userId).orElse(null);
 
@@ -215,12 +217,10 @@ public class UserService {
             System.out.println("🚨 Lỗi: Không tìm thấy userId: " + userId);
             return false;
         }
-
         if (address.trim().isEmpty() || zip.trim().isEmpty() || phone.trim().isEmpty()) {
             System.out.println("🚨 Lỗi: Address, ZIP hoặc Phone không được để trống!");
             return false;
         }
-
         Address newAddress = new Address();
         newAddress.setUser(user);
         newAddress.setAddress(address);
@@ -231,23 +231,44 @@ public class UserService {
         userRepository.save(user);
         return true;
     }
-
     public List<Address> getUserAddresses(String userId) {
         User user = userRepository.findById(userId).orElse(null);
-
         if (user == null) {
             System.out.println("🚨 Lỗi: Không tìm thấy userId: " + userId);
             return new ArrayList<>();
         }
-
         if (user.getAddresses() == null) {
             System.out.println("🚨 Lỗi: Danh sách địa chỉ của user rỗng!");
             return new ArrayList<>();
         }
-
         System.out.println("📢 Đang trả về danh sách địa chỉ: " + user.getAddresses().size());
         return user.getAddresses();
     }
+    public boolean deleteAddress(String userId, int id) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            System.out.println("🚨 Lỗi: Không tìm thấy userId: " + userId);
+            return false;
+        }
+
+        List<Address> addresses = user.getAddresses();
+        Address addressToDelete = addresses.stream()
+                .filter(address -> address.getId() == (id))  // ✅ So sánh với Long
+                .findFirst()
+                .orElse(null);
+
+        if (addressToDelete == null) {
+            System.out.println("🚨 Lỗi: Không tìm thấy địa chỉ với ID: " + id);
+            return false;
+        }
+
+        addresses.remove(addressToDelete);
+        userRepository.save(user);
+        System.out.println("✅ Đã xóa địa chỉ thành công!");
+        return true;
+    }
+
+
 
     public Boolean citizen(UserCitizenRequest request){
         UserCitizen existCICode = userCitizenRepository.findByAndCiCode(request.getCiCode());
