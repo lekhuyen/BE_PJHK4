@@ -107,8 +107,46 @@ public class Auction_ItemsService {
                 .build();
     }
 
+    public PageResponse<Auction_ItemsResponse> getAuctionItemsByName(int page, int size, String name) {
+        if (name == null || name.isEmpty()) {
+            return PageResponse.<Auction_ItemsResponse>builder()
+                    .currentPage(page)
+                    .pageSize(0)
+                    .totalPages(0)
+                    .totalElements(0)
+                    .data(Collections.emptyList()) // Return an empty list if name is not provided
+                    .build();
+        }
 
-//    lay sp chua ban
+        if (page == 0 && size == 0) {
+            PageRequest pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by("updatedAt").descending());
+            Page<Auction_Items> auctionItems = auction_ItemsRepository.findAllByItem_name(name, pageable);
+
+            return PageResponse.<Auction_ItemsResponse>builder()
+                    .currentPage(1)
+                    .pageSize(auctionItems.getSize())
+                    .totalPages(1)
+                    .totalElements(auctionItems.getSize())
+                    .data(auctionItems.stream().map(Auction_ItemsMapper::toAuction_ItemsResponse).collect(Collectors.toList()))
+                    .build();
+        }
+
+        // Apply pagination and sorting
+        Sort sort = Sort.by("updatedAt").descending();
+        PageRequest pageable = PageRequest.of(page - 1, size, sort);
+        Page<Auction_Items> auctionItemsPage = auction_ItemsRepository.findAllByItem_name(name, pageable);
+
+        return PageResponse.<Auction_ItemsResponse>builder()
+                .currentPage(page)
+                .pageSize(auctionItemsPage.getSize())
+                .totalPages(auctionItemsPage.getTotalPages())
+                .totalElements(auctionItemsPage.getTotalElements())
+                .data(auctionItemsPage.getContent().stream().map(Auction_ItemsMapper::toAuction_ItemsResponse).collect(Collectors.toList()))
+                .build();
+    }
+
+
+    //    lay sp chua ban
     public List<Auction_ItemsResponse> getAllAuction_ItemsBidding(){
         List<Auction_Items> auctionItems = auction_ItemsRepository.findAllProductBidding();
         return auctionItems.stream().map(Auction_ItemsMapper::toAuction_ItemsResponse).collect(Collectors.toList());
