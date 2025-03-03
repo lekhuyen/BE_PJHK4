@@ -79,7 +79,7 @@ public class AuthenticationService {
                 .phone(user.getPhone() == null ? "" : user.getPhone())
                 .address(user.getAddress() == null ? "" : user.getAddress())
                 .authenticated(true)
-                .money(user.getMoney())
+                .money(user.getMoney() != null ? user.getMoney()  : 0.0)
                 .build();
     }
 
