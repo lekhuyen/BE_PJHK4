@@ -141,7 +141,12 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/favorites/get-followers-count/{auctioneerId}").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/api/users/{userId}/money").permitAll()
 
-                        .requestMatchers("/ws/**").permitAll()
+
+                        .requestMatchers(HttpMethod.POST, "/api/room-video-call").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/room-video-call/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/room-video-call").permitAll()
+
+                        .requestMatchers("/ws/**","/signaling/**").permitAll()
 
                         //user co role admin moi truy cap dc
 //                        .requestMatchers(HttpMethod.GET,"/users")
