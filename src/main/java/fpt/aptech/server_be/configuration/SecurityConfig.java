@@ -146,6 +146,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/room-video-call/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/room-video-call").permitAll()
 
+
+                        .requestMatchers(HttpMethod.POST, "/api/favorites/add-comment").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/favorites/get-comments/{auctioneerId}").permitAll()
+
                         .requestMatchers("/ws/**","/signaling/**").permitAll()
 
                         //user co role admin moi truy cap dc

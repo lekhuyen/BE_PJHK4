@@ -1,11 +1,8 @@
 package fpt.aptech.server_be.service;
 
-import fpt.aptech.server_be.entities.Auction_Items;
-import fpt.aptech.server_be.entities.Favorite;
-import fpt.aptech.server_be.entities.User;
-import fpt.aptech.server_be.entities.Bidding; // 🔥 Kiểm tra đúng đường dẫn package
-
+import fpt.aptech.server_be.entities.*;
 import fpt.aptech.server_be.repositories.Auction_ItemsRepository;
+import fpt.aptech.server_be.repositories.CommentRepository;
 import fpt.aptech.server_be.repositories.FavoriteRepository;
 import fpt.aptech.server_be.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +19,8 @@ public class FavoriteService {
 
     @Autowired
     private FavoriteRepository favoriteRepository;
+    @Autowired
+    private CommentRepository commentRepository; // ✅ Inject CommentRepository
 
     @Autowired
     private UserRepository userRepository;
@@ -145,6 +144,34 @@ public class FavoriteService {
 
     public int getFollowersCount(String auctioneerId) {
         return favoriteRepository.countFollowersById(auctioneerId);
+    }
+
+
+
+    // ✅ Thêm đánh giá (rating)
+    // ✅ Thêm Comment vào Nhà Đấu Giá
+    public boolean addComment(String userId, String auctioneerId, String content) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            throw new RuntimeException("User không tồn tại!");
+        }
+
+        Comment comment = new Comment();
+        comment.setUser(user);
+        comment.setAuctioneerId(auctioneerId);
+        comment.setContent(content);
+        commentRepository.save(comment);
+        return true;
+    }
+    public List<Map<String, Object>> getComments(String auctioneerId) {
+        List<Comment> comments = commentRepository.findByAuctioneerId(auctioneerId);
+
+        return comments.stream().map(comment -> {
+            Map<String, Object> commentData = new HashMap<>();
+            commentData.put("userName", comment.getUser().getName());
+            commentData.put("content", comment.getContent());
+            return commentData;
+        }).collect(Collectors.toList());
     }
 
 
