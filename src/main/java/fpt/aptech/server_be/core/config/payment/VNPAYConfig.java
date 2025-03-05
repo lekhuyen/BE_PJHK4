@@ -19,6 +19,8 @@ public class VNPAYConfig {
     private String vnp_PayUrl;
     @Value("${payment.vnPay.returnUrl}")
     private String vnp_ReturnUrl;
+//    @Value("${payment.vnPay.reactUrl}")
+//    private String vnp_reactUrl;
     @Value("${payment.vnPay.tmnCode}")
     private String vnp_TmnCode ;
     @Getter
@@ -42,6 +44,7 @@ public class VNPAYConfig {
         vnpParamsMap.put("vnp_OrderType", this.orderType);
         vnpParamsMap.put("vnp_Locale", "vn");
         vnpParamsMap.put("vnp_ReturnUrl", this.vnp_ReturnUrl);
+//        vnpParamsMap.put("vnp_reactUrl", this.vnp_reactUrl);
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
         String vnpCreateDate = formatter.format(calendar.getTime());

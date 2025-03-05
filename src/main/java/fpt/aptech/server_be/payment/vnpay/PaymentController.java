@@ -40,6 +40,83 @@ public class PaymentController {
         return new ResponseObject<>(HttpStatus.OK, "Success", paymentService.createVnPayPayment(request,productId));
     }
 
+//    @GetMapping("/vn-pay-callback")
+//    public void payCallbackHandler(HttpServletRequest request, HttpServletResponse response) throws IOException {
+//        String status = request.getParameter("vnp_ResponseCode");
+//        String orderInfo = request.getParameter("vnp_OrderInfo");
+//
+//        if (status == null || orderInfo == null) {
+//            log.error("🚨 Lỗi callback: Thiếu thông tin thanh toán!");
+//            response.sendRedirect("http://192.168.1.30:8080/payment-failed");
+//            return;
+//        }
+//
+//        try {
+//            String productId = orderInfo.replace("Thanh toán cho sản phẩm ID: ", "").trim();
+//            log.info("✅ Thanh toán thành công - productId: {}", productId);
+//
+//            // 🔥 Tìm sản phẩm theo ID
+//            Auction_Items auctionItems = auction_ItemsRepository.findById(Integer.parseInt(productId))
+//                    .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy sản phẩm!"));
+//
+//            auctionItems.setSoldout(true);
+//            auctionItems.setPaid(true);
+//            auction_ItemsRepository.save(auctionItems);
+//
+//            // ✅ Lấy thông tin người bán, người mua, và admin
+//            User seller = auctionItems.getUser();
+//            User buyer = auctionItems.getBuyer();
+//            User admin = userRepository.findByEmail("admin@gmail.com")
+//                    .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy tài khoản admin!"));
+//
+//            if (seller == null || buyer == null) {
+//                log.error("🚨 Lỗi: Không tìm thấy người bán hoặc người mua!");
+//                response.sendRedirect("http://192.168.1.30:8080/payment-failed");
+//                return;
+//            }
+//
+//            // ✅ Lấy giá thắng cuộc từ `Bidding`
+//            Bidding bidding = auctionItems.getBidding();
+//            double finalPrice = bidding.getPrice();
+//
+//            // ✅ Kiểm tra nếu `money` của buyer hoặc seller là null thì đặt về 0.0
+//            seller.setMoney((seller.getMoney() != null ? seller.getMoney() : 0.0));
+//            buyer.setMoney((buyer.getMoney() != null ? buyer.getMoney() : 0.0));
+//            admin.setMoney((admin.getMoney() != null ? admin.getMoney() : 0.0));
+//
+//            // 🔥 Kiểm tra nếu số dư của buyer có đủ không
+//            if (buyer.getMoney() < finalPrice) {
+//                log.error("🚨 Lỗi: Người mua {} không đủ tiền để thanh toán! Số dư: ${}", buyer.getName(), buyer.getMoney());
+//                response.sendRedirect("http://192.168.1.30:8080/payment-failed");
+//                return;
+//            }
+//
+//            // ✅ Tính toán số tiền người bán nhận được sau khi trừ phí 2%
+//            double fee = finalPrice * 0.02; // 🔥 Tính phí 2%
+//            double amountAfterFee = finalPrice - fee; // 🔥 Số tiền thực nhận của người bán
+//
+//            // ✅ Cập nhật tiền
+//            seller.setMoney(seller.getMoney() + amountAfterFee); // Người bán nhận tiền sau khi trừ phí
+//            buyer.setMoney(buyer.getMoney() - finalPrice); // Người mua bị trừ toàn bộ tiền
+//            admin.setMoney(admin.getMoney() + fee); // Admin nhận 2% phí giao dịch
+//
+//            // ✅ Lưu cập nhật vào database
+//            userRepository.save(seller);
+//            userRepository.save(buyer);
+//            userRepository.save(admin);
+//
+//            log.info("✅ Cập nhật số tiền thành công: Người bán {} nhận +${}, Người mua {} bị trừ -${}, Admin nhận +${}",
+//                    seller.getName(), amountAfterFee, buyer.getName(), finalPrice, fee);
+//
+//            response.sendRedirect("http://localhost:3000/profile-page");
+////            response.sendRedirect("myapp://mybids");
+//
+//        } catch (Exception e) {
+//            log.error("🚨 Lỗi xử lý callback: {}", e.getMessage());
+//            response.sendRedirect("http://192.168.1.30:8080/payment-failed");
+//        }
+//    }
+
     @GetMapping("/vn-pay-callback")
     public void payCallbackHandler(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String status = request.getParameter("vnp_ResponseCode");
@@ -47,7 +124,7 @@ public class PaymentController {
 
         if (status == null || orderInfo == null) {
             log.error("🚨 Lỗi callback: Thiếu thông tin thanh toán!");
-            response.sendRedirect("http://192.168.1.30:8080/payment-failed");
+            response.sendRedirect("http://localhost:3000/payment-failed"); // 🔥 Đổi thành React URL
             return;
         }
 
@@ -71,7 +148,7 @@ public class PaymentController {
 
             if (seller == null || buyer == null) {
                 log.error("🚨 Lỗi: Không tìm thấy người bán hoặc người mua!");
-                response.sendRedirect("http://192.168.1.30:8080/payment-failed");
+                response.sendRedirect("http://localhost:3000/payment-failed");
                 return;
             }
 
@@ -87,7 +164,7 @@ public class PaymentController {
             // 🔥 Kiểm tra nếu số dư của buyer có đủ không
             if (buyer.getMoney() < finalPrice) {
                 log.error("🚨 Lỗi: Người mua {} không đủ tiền để thanh toán! Số dư: ${}", buyer.getName(), buyer.getMoney());
-                response.sendRedirect("http://192.168.1.30:8080/payment-failed");
+                response.sendRedirect("http://localhost:3000/payment-failed");
                 return;
             }
 
@@ -108,11 +185,19 @@ public class PaymentController {
             log.info("✅ Cập nhật số tiền thành công: Người bán {} nhận +${}, Người mua {} bị trừ -${}, Admin nhận +${}",
                     seller.getName(), amountAfterFee, buyer.getName(), finalPrice, fee);
 
-            response.sendRedirect("myapp://mybids");
+            // ✅ Kiểm tra User-Agent để phân biệt Mobile và React Web
+            String userAgent = request.getHeader("User-Agent");
+            log.info("📢 User-Agent: {}", userAgent);
+
+            if (userAgent != null && userAgent.contains("Mobile")) {
+                response.sendRedirect("myapp://mybids"); // 🔥 Mobile chuyển hướng về app
+            } else {
+                response.sendRedirect("http://localhost:3000/manager-post"); // 🔥 React chuyển hướng về web
+            }
 
         } catch (Exception e) {
             log.error("🚨 Lỗi xử lý callback: {}", e.getMessage());
-            response.sendRedirect("http://192.168.1.30:8080/payment-failed");
+            response.sendRedirect("http://localhost:3000/payment-failed");
         }
     }
 
