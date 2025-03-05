@@ -5,6 +5,7 @@ import com.cloudinary.utils.ObjectUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fpt.aptech.server_be.dto.response.ChatMessResponse;
+import fpt.aptech.server_be.dto.response.ChatRoomRes;
 import fpt.aptech.server_be.dto.response.NotificationChatResponse;
 import fpt.aptech.server_be.entities.ChatMessage;
 import fpt.aptech.server_be.entities.ChatRoom;
@@ -183,6 +184,17 @@ public class ChatMessageService {
     }
 
 
+    public ChatRoomRes getRoomById(int roomId){
+       ChatRoom chatRoom = chatRoomRepository.findById(roomId).get();
+        ChatRoomRes chatRoomRes = new ChatRoomRes();
+        chatRoomRes.setRoomId(roomId);
+        chatRoomRes.setSellerId(chatRoom.getSeller().getId());
+        chatRoomRes.setBuyerId(chatRoom.getBuyer().getId());
+
+        return chatRoomRes;
+    }
+
+
     public List<ChatMessResponse> getAllMessagesByBuyerId(int chatRoomId,String buyerId) {
         User user = userRepository.findById(buyerId).orElse(null);
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElse(null);
@@ -215,5 +227,7 @@ public class ChatMessageService {
             notificationChatRepository.save(notificationChat);
         }
     }
+
+
 
 }
