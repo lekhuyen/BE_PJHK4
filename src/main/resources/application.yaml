@@ -4,7 +4,7 @@ spring:
     name: server_be
   datasource:
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-    url: jdbc:sqlserver://localhost:1433;databaseName=PJHK4;TrustServerCertificate=true;encrypt=false;sendStringParametersAsUnicode=true
+    url: jdbc:sqlserver://localhost:1433;databaseName=PJHK42;TrustServerCertificate=true;encrypt=false;sendStringParametersAsUnicode=true
     username: sa
     password: 123
   autoconfigure:
@@ -68,7 +68,9 @@ payment:
     url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
     tmnCode: GLI8RRMU
     secretKey: A7G4E6A8TGB8TO0J2FR4Z574LHJGHUP0
-    returnUrl: http://localhost:8080/api/v1/payment/vn-pay-callback
+#    returnUrl: http://localhost:8080/api/v1/payment/vn-pay-callback
+#    reactUrl: http://localhost:3000/profile-page
+    returnUrl: http://172.16.1.94:8080/api/v1/payment/vn-pay-callback?source=web
     version: 2.1.0
     command: pay
     orderType: other

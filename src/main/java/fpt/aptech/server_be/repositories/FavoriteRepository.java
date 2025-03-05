@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
 import java.util.List;
 
 @Repository
@@ -30,7 +31,6 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Integer> {
 
     @Query("SELECT COUNT(f) FROM Favorite f WHERE f.auctioneerId = :auctioneerId")
     int countFollowersById(@Param("auctioneerId") String auctioneerId);
-
 
 
 }
