@@ -70,16 +70,32 @@ public class ContactService {
     }
 
     // Send an email to the user after the reply message is updated
-    private void sendReplyEmail(Contact contact) {
+    private static final String FROM_EMAIL = "biddora38@gmail.com";  // Set your website's contact email
+    private static final String COMPANY_NAME = "Biddora";
+    private static final String WEBSITE_URL = "https://biddora.com";
+    private static final String SUPPORT_EMAIL = "biddora38@gmail.com";
+
+    public void sendReplyEmail(Contact contact) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
-            message.setTo(contact.getEmail());  // Send email to the contact's email
-            message.setSubject("Your Contact Inquiry - Reply Received");
-            message.setText("Dear " + contact.getName() + ",\n\n" +
-                    "We have received your inquiry and here is our response:\n\n" +
-                    contact.getReplyMessage() + "\n\n" +
-                    "Best regards,\n" +
-                    "Your Company Name");
+            message.setFrom(FROM_EMAIL);  // Set email to appear from website support
+            message.setTo(contact.getEmail());  // Send to the recipient
+            message.setSubject("Thank You for Contacting Us - " + COMPANY_NAME);
+
+            String emailContent = "Dear " + contact.getName() + ",\n\n"
+                    + "Thank you for reaching out to us at " + COMPANY_NAME + ". We have received your inquiry and are happy to assist you.\n\n"
+                    + "Here is our response to your inquiry:\n"
+                    + "-------------------------------------------\n"
+                    + contact.getReplyMessage() + "\n"
+                    + "-------------------------------------------\n\n"
+                    + "If you have any further questions, feel free to contact us again.\n\n"
+                    + "Best Regards,\n"
+                    + COMPANY_NAME + " Support Team\n"
+                    + "Website: " + WEBSITE_URL + "\n"
+                    + "Support Email: " + SUPPORT_EMAIL + "\n\n"
+                    + "This is an automated message. Please do not reply to this email.";
+
+            message.setText(emailContent);
 
             // Send the email
             emailSender.send(message);

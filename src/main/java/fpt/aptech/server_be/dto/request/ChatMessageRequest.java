@@ -21,6 +21,8 @@ public class ChatMessageRequest {
     @Nullable
     String content;
     String sender;
+    String receiver = null;
+    String senderName = null;
     @Nullable
     List<MultipartFile> images = new ArrayList<>();
     @Nullable

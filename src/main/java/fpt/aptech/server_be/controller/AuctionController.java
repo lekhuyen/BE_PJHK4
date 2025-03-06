@@ -30,10 +30,21 @@ public class AuctionController {
 
 
 
+//    @GetMapping
+//    public ApiResponse<PageResponse<Auction_ItemsResponse>> getAllAuctions(
+//            @RequestParam(value = "page", required = false,defaultValue = "1") int page,
+//            @RequestParam(value = "size", required = false,defaultValue = "50") int size,
+//            @RequestParam(value = "name", required = false) String name
+//    ) {
+//        return ApiResponse.<PageResponse<Auction_ItemsResponse>>builder()
+//                .result(auction_ItemsService.getAllAuction_Items( page, size,name))
+//                .build();
+//    }
+
     @GetMapping
     public ApiResponse<PageResponse<Auction_ItemsResponse>> getAllAuctions(
-            @RequestParam(value = "page", required = false,defaultValue = "1") int page,
-            @RequestParam(value = "size", required = false,defaultValue = "50") int size,
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "50") int size,
             @RequestParam(value = "name", required = false) String name
     ) {
         return ApiResponse.<PageResponse<Auction_ItemsResponse>>builder()

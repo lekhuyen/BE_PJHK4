@@ -2,10 +2,7 @@ package fpt.aptech.server_be.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import fpt.aptech.server_be.dto.request.ChatMessageRequest;
-import fpt.aptech.server_be.dto.response.CategoryResponse;
-import fpt.aptech.server_be.dto.response.ChatMessResponse;
-import fpt.aptech.server_be.dto.response.ChatMessageResponse;
-import fpt.aptech.server_be.dto.response.ChatRoomResponse;
+import fpt.aptech.server_be.dto.response.*;
 import fpt.aptech.server_be.entities.ChatMessage;
 import fpt.aptech.server_be.entities.ChatRoom;
 import fpt.aptech.server_be.entities.TypingStatus;
@@ -141,7 +138,14 @@ public ChatMessResponse sendMessages(@ModelAttribute ChatMessageRequest messageR
             message.setSenderId(chatMessageRequest.getSender());
             message.setImages(chatMessageRequest.getImagess());
             message.setTimestamp(chatMessageRequest.getTimestamp());
+            message.setReceiverId(chatMessageRequest.getReceiver());
+            message.setSenderName(chatMessageRequest.getSenderName());
+
         messagingTemplate.convertAndSend("/topic/room/" + chatMessageRequest.getRoomId(), message);
+
+        if (chatMessageRequest.getReceiver() != null) {
+            messagingTemplate.convertAndSend("/topic/user/" + chatMessageRequest.getReceiver(), message);
+        }
     }
 
 
@@ -154,6 +158,11 @@ public ChatMessResponse sendMessages(@ModelAttribute ChatMessageRequest messageR
     @GetMapping("/room/content/{chatRoomId}/{buyerId}")
     public List<ChatMessResponse> getChatContent(@PathVariable int chatRoomId, @PathVariable String buyerId) {
         return chatMessageService.getAllMessagesByBuyerId(chatRoomId,buyerId);
+    }
+
+    @GetMapping("/room/get-room/{roomId}")
+    public ChatRoomRes getRoomById(@PathVariable int roomId) {
+        return chatMessageService.getRoomById(roomId);
     }
     @GetMapping("/room/message/{chatRoomId}")
     public List<ChatMessResponse> getMessageChatOfRoom(@PathVariable int chatRoomId) {
