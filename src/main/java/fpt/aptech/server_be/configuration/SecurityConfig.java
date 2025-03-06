@@ -150,6 +150,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/favorites/add-comment").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/favorites/get-comments/{auctioneerId}").permitAll()
 
+
+                        .requestMatchers(HttpMethod.GET, "/api/chatroom/room/get-room/**").permitAll()
+
                         .requestMatchers("/ws/**","/signaling/**").permitAll()
 
                         //user co role admin moi truy cap dc

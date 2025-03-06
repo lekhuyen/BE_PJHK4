@@ -1,24 +1,17 @@
 package fpt.aptech.server_be.dto.response;
 
-import jakarta.annotation.Nullable;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.Date;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ChatMessageResponse {
-    String content;
+public class ChatRoomRes {
     int roomId;
-    String senderId;
+    String buyerId;
+
+    String sellerId;
     String senderName;
-    String receiverId;
-    Date timestamp;
-    @Nullable
-    List<String> images;
 }
