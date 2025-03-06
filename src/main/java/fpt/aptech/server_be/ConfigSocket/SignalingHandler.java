@@ -20,6 +20,8 @@ public class SignalingHandler extends TextWebSocketHandler {
     private final Map<String, String> roomCreator = new ConcurrentHashMap<>();
     private final Map<String, List<Product>> roomToProducts = new ConcurrentHashMap<>();
     private final Map<String, Product> roomToPinnedProduct = new ConcurrentHashMap<>();
+    private final Map<String, Map<String, Boolean>> roomToRaisedHands = new ConcurrentHashMap<>();
+    private final Map<String, List<Comment>> roomToComments = new ConcurrentHashMap<>(); // Lưu trữ bình luận
 
     private static class Product {
         String id;
@@ -40,7 +42,22 @@ public class SignalingHandler extends TextWebSocketHandler {
             return "{\"id\": \"" + id + "\", \"name\": \"" + name + "\", \"price\": " + price +
                     ", \"imageUrl\": \"" + imageUrl + "\", \"link\": \"" + link + "\"}";
         }
+    }
 
+    private static class Comment {
+        String username;
+        String content;
+        long timestamp;
+
+        Comment(String username, String content, long timestamp) {
+            this.username = username;
+            this.content = content;
+            this.timestamp = timestamp;
+        }
+
+        String toJson() {
+            return "{\"username\": \"" + username + "\", \"content\": \"" + content + "\", \"timestamp\": " + timestamp + "}";
+        }
     }
 
     @Override
@@ -54,17 +71,13 @@ public class SignalingHandler extends TextWebSocketHandler {
             for (String param : query.split("&")) {
                 String[] parts = param.split("=");
                 if (parts.length > 1) {
-                    if (parts[0].equals("roomId")) {
-                        roomId = parts[1];
-                    } else if (parts[0].equals("username")) {
-                        username = parts[1];
-                    } else if (parts[0].equals("isCreator")) {
-                        isCreator = Boolean.parseBoolean(parts[1]);
-                    }
+                    if (parts[0].equals("roomId")) roomId = parts[1];
+                    else if (parts[0].equals("username")) username = parts[1];
+                    else if (parts[0].equals("isCreator")) isCreator = Boolean.parseBoolean(parts[1]);
                 }
             }
         }
-        if (roomId == null || roomId.trim().isEmpty() || username == null || username.trim().isEmpty()) {
+        if (roomId == null || username == null) {
             session.close();
             System.err.println("Invalid roomId or username, closing connection: " + session.getId());
             return;
@@ -74,8 +87,9 @@ public class SignalingHandler extends TextWebSocketHandler {
         sessionToRoom.put(session.getId(), roomId);
         sessionToUsername.put(session.getId(), username);
         usernameToSession.put(username, session.getId());
-
         roomToProducts.computeIfAbsent(roomId, k -> new ArrayList<>());
+        roomToRaisedHands.computeIfAbsent(roomId, k -> new ConcurrentHashMap<>());
+        roomToComments.computeIfAbsent(roomId, k -> new ArrayList<>());
 
         if (isCreator) {
             roomCreator.putIfAbsent(roomId, username);
@@ -88,22 +102,13 @@ public class SignalingHandler extends TextWebSocketHandler {
             }
         }
 
-        System.out.println("User " + username + " joined room " + roomId + " with session: " + session.getId() + ". Streamer of room: " + roomToStreamer.get(roomId));
+        System.out.println("User " + username + " joined room " + roomId + " with session: " + session.getId());
 
         String joinMessage = "{\"id\": \"" + username + "\", \"type\": \"join\", \"username\": \"" + username + "\", \"roomId\": \"" + roomId + "\"}";
         broadcast(roomId, new TextMessage(joinMessage), session.getId());
 
-        String existingUsers = "{\"type\": \"existingUsers\", \"users\": [";
-        boolean first = true;
-        for (String sessionId : rooms.get(roomId).keySet()) {
-            if (!sessionId.equals(session.getId())) {
-                String existingUsername = sessionToUsername.get(sessionId);
-                if (!first) existingUsers += ",";
-                existingUsers += "\"" + existingUsername + "\"";
-                first = false;
-            }
-        }
-        existingUsers += "]}";
+        String existingUsers = "{\"type\": \"existingUsers\", \"users\": [" + String.join(",", rooms.get(roomId).keySet().stream()
+                .filter(id -> !id.equals(session.getId())).map(sessionToUsername::get).map(u -> "\"" + u + "\"").toArray(String[]::new)) + "]}";
         session.sendMessage(new TextMessage(existingUsers));
 
         String streamerId = roomToStreamer.get(roomId);
@@ -111,29 +116,27 @@ public class SignalingHandler extends TextWebSocketHandler {
             String roomInfoMessage = "{\"type\": \"roomInfo\", \"streamerId\": \"" + streamerId + "\", \"roomId\": \"" + roomId + "\"}";
             session.sendMessage(new TextMessage(roomInfoMessage));
             broadcast(roomId, new TextMessage(roomInfoMessage), session.getId());
-            System.out.println("Sent roomInfo to all users in room " + roomId + ": " + roomInfoMessage);
-        } else {
-            System.err.println("No Streamer found for room " + roomId + " when user " + username + " joined");
         }
 
         List<Product> products = roomToProducts.getOrDefault(roomId, new ArrayList<>());
-        StringBuilder productsMessage = new StringBuilder("{\"type\": \"products\", \"products\": [");
-        first = true;
-        for (Product product : products) {
-            if (!first) productsMessage.append(",");
-            productsMessage.append(product.toJson());
-            first = false;
-        }
-        productsMessage.append("]}");
-        session.sendMessage(new TextMessage(productsMessage.toString()));
-        System.out.println("Sent products list to " + username + " in room " + roomId + ": " + productsMessage);
+        String productsMessage = "{\"type\": \"products\", \"products\": [" + String.join(",", products.stream().map(Product::toJson).toArray(String[]::new)) + "]}";
+        session.sendMessage(new TextMessage(productsMessage));
 
         Product pinnedProduct = roomToPinnedProduct.get(roomId);
         if (pinnedProduct != null) {
             String pinnedProductMessage = "{\"type\": \"pinnedProduct\", \"product\": " + pinnedProduct.toJson() + "}";
             session.sendMessage(new TextMessage(pinnedProductMessage));
-            System.out.println("Sent pinned product to " + username + " in room " + roomId + ": " + pinnedProductMessage);
         }
+
+        Map<String, Boolean> raisedHands = roomToRaisedHands.get(roomId);
+        String raisedHandsMessage = "{\"type\": \"raisedHands\", \"raisedHands\": " + new JSONObject(raisedHands).toString() + "}";
+        session.sendMessage(new TextMessage(raisedHandsMessage));
+
+        // Gửi danh sách bình luận hiện tại khi người dùng mới tham gia
+        List<Comment> comments = roomToComments.getOrDefault(roomId, new ArrayList<>());
+        String commentsMessage = "{\"type\": \"comments\", \"comments\": [" + String.join(",", comments.stream().map(Comment::toJson).toArray(String[]::new)) + "]}";
+        session.sendMessage(new TextMessage(commentsMessage));
+        System.out.println("Sent comments list to " + username + " in room " + roomId + ": " + commentsMessage);
     }
 
     @Override
@@ -144,131 +147,92 @@ public class SignalingHandler extends TextWebSocketHandler {
             return;
         }
 
-        Map<String, WebSocketSession> roomSessions = rooms.get(roomId);
         System.out.println("Message from " + session.getId() + " in room " + roomId + ": " + message.getPayload());
+        JSONObject json = new JSONObject(message.getPayload());
+        String type = json.optString("type");
 
-        try {
-            JSONObject json = new JSONObject(message.getPayload());
-            String type = json.optString("type");
-
-            if ("status".equals(type)) {
-                broadcast(roomId, message, session.getId());
-            } else if ("getRoomInfo".equals(type)) {
-                String streamerId = roomToStreamer.get(roomId);
-                if (streamerId != null) {
-                    String roomInfoMessage = "{\"type\": \"roomInfo\", \"streamerId\": \"" + streamerId + "\", \"roomId\": \"" + roomId + "\"}";
-                    session.sendMessage(new TextMessage(roomInfoMessage));
-                    System.out.println("Sent roomInfo to " + sessionToUsername.get(session.getId()) + " in room " + roomId + ": " + roomInfoMessage);
-                    broadcast(roomId, new TextMessage(roomInfoMessage), session.getId());
-                } else {
-                    System.err.println("No Streamer found for room " + roomId + " when handling getRoomInfo from " + sessionToUsername.get(session.getId()));
-                }
-            } else if ("addProduct".equals(type)) {
-                String username = sessionToUsername.get(session.getId());
-                String streamerId = roomToStreamer.get(roomId);
-                if (streamerId == null) {
-                    System.err.println("Streamer not found for room " + roomId + ", cannot add product");
-                    return;
-                }
-                if (!username.equals(streamerId)) {
-                    System.err.println("User " + username + " is not the Streamer in room " + roomId + ", cannot add product");
-                    return;
-                }
-
-                List<Product> productList = roomToProducts.get(roomId);
-                if (productList == null) {
-                    System.err.println("Product list not initialized for room " + roomId);
-                    productList = new ArrayList<>();
-                    roomToProducts.put(roomId, productList);
-                }
-
-                String productId = json.optString("id");
-                String productName = json.optString("name");
-                double productPrice = json.optDouble("price", 0.0);
-                String productImageUrl = json.optString("imageUrl");
-                String productLink = json.optString("link");
-
-                Product product = new Product(productId, productName, productPrice, productImageUrl, productLink);
-                productList.add(product);
-                System.out.println("Added product to room " + roomId + ": " + product.toJson());
-
-                List<Product> products = roomToProducts.get(roomId);
-                StringBuilder productsMessage = new StringBuilder("{\"type\": \"products\", \"products\": [");
-                boolean first = true;
-                for (Product p : products) {
-                    if (!first) productsMessage.append(",");
-                    productsMessage.append(p.toJson());
-                    first = false;
-                }
-                productsMessage.append("]}");
-                broadcast(roomId, new TextMessage(productsMessage.toString()), null);
-                System.out.println("Broadcast updated products list to room " + roomId + ": " + productsMessage);
-            } else if ("pinProduct".equals(type)) {
-                String username = sessionToUsername.get(session.getId());
-                String streamerId = roomToStreamer.get(roomId);
-                if (streamerId == null) {
-                    System.err.println("Streamer not found for room " + roomId + ", cannot pin product");
-                    return;
-                }
-                if (!username.equals(streamerId)) {
-                    System.err.println("User " + username + " is not the Streamer in room " + roomId + ", cannot pin product");
-                    return;
-                }
-
-                String productId = json.optString("productId");
-                Product productToPin = null;
-                for (Product product : roomToProducts.get(roomId)) {
-                    if (product.id.equals(productId)) {
-                        productToPin = product;
-                        break;
-                    }
-                }
-
-                if (productToPin != null) {
-                    roomToPinnedProduct.put(roomId, productToPin);
-                    String pinnedProductMessage = "{\"type\": \"pinnedProduct\", \"product\": " + productToPin.toJson() + "}";
-                    broadcast(roomId, new TextMessage(pinnedProductMessage), null);
-                    System.out.println("Pinned product and broadcast to room " + roomId + ": " + pinnedProductMessage);
-                } else {
-                    System.err.println("Product with ID " + productId + " not found in room " + roomId);
-                }
-            } else if ("unpinProduct".equals(type)) {
-                String username = sessionToUsername.get(session.getId());
-                String streamerId = roomToStreamer.get(roomId);
-                if (streamerId == null) {
-                    System.err.println("Streamer not found for room " + roomId + ", cannot unpin product");
-                    return;
-                }
-                if (!username.equals(streamerId)) {
-                    System.err.println("User " + username + " is not the Streamer in room " + roomId + ", cannot unpin product");
-                    return;
-                }
-
-                roomToPinnedProduct.remove(roomId);
-                String unpinMessage = "{\"type\": \"unpinProduct\"}";
-                broadcast(roomId, new TextMessage(unpinMessage), null);
-                System.out.println("Unpinned product and broadcast to room " + roomId + ": " + unpinMessage);
-            } else if (json.has("sdp") || json.has("candidate")) {
-                String target = json.optString("target");
-                if (target == null || target.isEmpty()) {
-                    System.err.println("Invalid target in SDP/ICE candidate message: " + message.getPayload());
-                    return;
-                }
-                String targetSessionId = usernameToSession.get(target);
-                if (targetSessionId == null || !roomSessions.containsKey(targetSessionId)) {
-                    System.err.println("Target " + target + " not found in room " + roomId);
-                    return;
-                }
-                WebSocketSession targetSession = roomSessions.get(targetSessionId);
+        if ("status".equals(type)) {
+            broadcast(roomId, message, session.getId());
+        } else if ("getRoomInfo".equals(type)) {
+            String streamerId = roomToStreamer.get(roomId);
+            if (streamerId != null) {
+                String roomInfoMessage = "{\"type\": \"roomInfo\", \"streamerId\": \"" + streamerId + "\", \"roomId\": \"" + roomId + "\"}";
+                session.sendMessage(new TextMessage(roomInfoMessage));
+                broadcast(roomId, new TextMessage(roomInfoMessage), session.getId());
+                System.out.println("Sent roomInfo to " + sessionToUsername.get(session.getId()) + " in room " + roomId);
+            }
+        } else if ("addProduct".equals(type)) {
+            String username = sessionToUsername.get(session.getId());
+            if (!username.equals(roomToStreamer.get(roomId))) {
+                System.err.println("User " + username + " is not the Streamer in room " + roomId + ", cannot add product");
+                return;
+            }
+            Product product = new Product(json.optString("id"), json.optString("name"), json.optDouble("price"), json.optString("imageUrl"), json.optString("link"));
+            roomToProducts.get(roomId).add(product);
+            String productsMessage = "{\"type\": \"products\", \"products\": [" + String.join(",", roomToProducts.get(roomId).stream().map(Product::toJson).toArray(String[]::new)) + "]}";
+            broadcast(roomId, new TextMessage(productsMessage), null);
+            System.out.println("Broadcast updated products list to room " + roomId);
+        } else if ("pinProduct".equals(type)) {
+            String username = sessionToUsername.get(session.getId());
+            if (!username.equals(roomToStreamer.get(roomId))) {
+                System.err.println("User " + username + " is not the Streamer in room " + roomId + ", cannot pin product");
+                return;
+            }
+            String productId = json.optString("productId");
+            Product productToPin = roomToProducts.get(roomId).stream().filter(p -> p.id.equals(productId)).findFirst().orElse(null);
+            if (productToPin != null) {
+                roomToPinnedProduct.put(roomId, productToPin);
+                String pinnedProductMessage = "{\"type\": \"pinnedProduct\", \"product\": " + productToPin.toJson() + "}";
+                broadcast(roomId, new TextMessage(pinnedProductMessage), null);
+                System.out.println("Pinned product and broadcast to room " + roomId);
+            }
+        } else if ("unpinProduct".equals(type)) {
+            String username = sessionToUsername.get(session.getId());
+            if (!username.equals(roomToStreamer.get(roomId))) {
+                System.err.println("User " + username + " is not the Streamer in room " + roomId + ", cannot unpin product");
+                return;
+            }
+            roomToPinnedProduct.remove(roomId);
+            broadcast(roomId, new TextMessage("{\"type\": \"unpinProduct\"}"), null);
+            System.out.println("Unpinned product and broadcast to room " + roomId);
+        } else if ("raiseHand".equals(type)) {
+            String username = sessionToUsername.get(session.getId());
+            boolean raised = json.optBoolean("raised");
+            Map<String, Boolean> raisedHands = roomToRaisedHands.get(roomId);
+            if (raised) raisedHands.put(username, true);
+            else raisedHands.remove(username);
+            String raisedHandsMessage = "{\"type\": \"raisedHands\", \"raisedHands\": " + new JSONObject(raisedHands).toString() + "}";
+            broadcast(roomId, new TextMessage(raisedHandsMessage), null);
+            System.out.println("Broadcast raised hands update to room " + roomId);
+        } else if ("comment".equals(type)) {
+            String username = sessionToUsername.get(session.getId());
+            String content = json.optString("content");
+            long timestamp = json.optLong("timestamp");
+            if (content != null && !content.trim().isEmpty()) {
+                Comment comment = new Comment(username, content, timestamp);
+                roomToComments.get(roomId).add(comment);
+                String commentMessage = "{\"type\": \"comment\", \"username\": \"" + username + "\", \"content\": \"" + content + "\", \"timestamp\": " + timestamp + "}";
+                broadcast(roomId, new TextMessage(commentMessage), null);
+                System.out.println("Broadcast comment to room " + roomId + ": " + commentMessage);
+            }
+        } else if (json.has("sdp") || json.has("candidate")) {
+            String target = json.optString("target");
+            if (target == null || target.isEmpty()) {
+                System.err.println("Invalid target in SDP/ICE candidate message: " + message.getPayload());
+                return;
+            }
+            String targetSessionId = usernameToSession.get(target);
+            if (targetSessionId != null && rooms.get(roomId).containsKey(targetSessionId)) {
+                WebSocketSession targetSession = rooms.get(roomId).get(targetSessionId);
                 if (targetSession.isOpen()) {
                     targetSession.sendMessage(message);
-                    System.out.println("Sent to target " + target + " (session: " + targetSessionId + "): " + message.getPayload());
+                    System.out.println("Sent to target " + target + " (session: " + targetSessionId + ")");
                 }
             } else {
-                broadcast(roomId, message, session.getId());
+                System.err.println("Target " + target + " not found in room " + roomId);
             }
-        } catch (Exception e) {
-            System.err.println("Error parsing message: " + e.getMessage());
+        } else {
+            broadcast(roomId, message, session.getId());
         }
     }
 
@@ -287,22 +251,30 @@ public class SignalingHandler extends TextWebSocketHandler {
                     roomCreator.remove(roomId);
                     roomToProducts.remove(roomId);
                     roomToPinnedProduct.remove(roomId);
-                } else if (username.equals(roomToStreamer.get(roomId))) {
-                    String newStreamer = roomSessions.keySet().stream()
-                            .map(sessionToUsername::get)
-                            .findFirst()
-                            .orElse(null);
-                    if (newStreamer != null) {
-                        roomToStreamer.put(roomId, newStreamer);
-                        String roomInfoMessage = "{\"type\": \"roomInfo\", \"streamerId\": \"" + newStreamer + "\", \"roomId\": \"" + roomId + "\"}";
-                        broadcast(roomId, new TextMessage(roomInfoMessage), null);
-                        System.out.println("Sent roomInfo to all users in room " + roomId + " after Streamer left: " + roomInfoMessage);
+                    roomToRaisedHands.remove(roomId);
+                    roomToComments.remove(roomId);
+                    System.out.println("Room " + roomId + " is empty and removed");
+                } else {
+                    if (username.equals(roomToStreamer.get(roomId))) {
+                        String newStreamer = roomSessions.keySet().stream().map(sessionToUsername::get).findFirst().orElse(null);
+                        if (newStreamer != null) {
+                            roomToStreamer.put(roomId, newStreamer);
+                            String roomInfoMessage = "{\"type\": \"roomInfo\", \"streamerId\": \"" + newStreamer + "\", \"roomId\": \"" + roomId + "\"}";
+                            broadcast(roomId, new TextMessage(roomInfoMessage), null);
+                            System.out.println("New Streamer assigned: " + newStreamer + " for room " + roomId);
+                        }
+                    }
+                    Map<String, Boolean> raisedHands = roomToRaisedHands.get(roomId);
+                    if (raisedHands.containsKey(username)) {
+                        raisedHands.remove(username);
+                        String raisedHandsMessage = "{\"type\": \"raisedHands\", \"raisedHands\": " + new JSONObject(raisedHands).toString() + "}";
+                        broadcast(roomId, new TextMessage(raisedHandsMessage), null);
+                        System.out.println("Updated raised hands after " + username + " left room " + roomId);
                     }
                 }
-                System.out.println("User " + username + " left room " + roomId + " with session: " + session.getId());
-
                 String leaveMessage = "{\"id\": \"" + username + "\", \"type\": \"leave\", \"roomId\": \"" + roomId + "\"}";
                 broadcast(roomId, new TextMessage(leaveMessage), session.getId());
+                System.out.println("User " + username + " left room " + roomId);
             }
         }
     }
@@ -319,13 +291,9 @@ public class SignalingHandler extends TextWebSocketHandler {
                         } catch (Exception e) {
                             System.err.println("Failed to broadcast to " + session.getId() + ": " + e.getMessage());
                         }
-                    } else {
-                        System.err.println("Cannot broadcast to session " + session.getId() + ", session is not open");
                     }
                 }
             }
-        } else {
-            System.err.println("No sessions found for room " + roomId);
         }
     }
 }

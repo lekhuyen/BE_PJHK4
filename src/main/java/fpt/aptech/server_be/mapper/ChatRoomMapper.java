@@ -17,6 +17,7 @@ public class ChatRoomMapper {
         ChatRoomResponse response = new ChatRoomResponse();
         response.setRoomId(request.getId());
         response.setUserId(request.getSeller().getId());
+        response.setSellerId(request.getSeller().getId());
         response.setBuyerName(request.getBuyer().getName());
         response.setSellerName(request.getSeller().getName());
         response.setItem_id(request.getAcAuctionItem().getItem_id());
