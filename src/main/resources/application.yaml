@@ -5,7 +5,7 @@ spring:
     name: server_be
   datasource:
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-    url: jdbc:sqlserver://localhost:1433;databaseName=PJHK4;TrustServerCertificate=true
+    url: jdbc:sqlserver://localhost:1433;databaseName=PJHK42;TrustServerCertificate=true
     username: sa
     password: 123
   autoconfigure:
@@ -34,6 +34,8 @@ spring:
           auth: true
           starttls:
             enable: true
+  rabbitmq:
+    uri: "amqps://ixvxgtrj:NuqKkp-eIyM5bLWNNxeECbNiU-7W_V8_@fuji.lmq.cloudamqp.com/ixvxgtrj"
   kafka:
     bootstrap-servers: localhost:9092
     consumer:
@@ -59,7 +61,7 @@ payment:
     url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
     tmnCode: GLI8RRMU
     secretKey: A7G4E6A8TGB8TO0J2FR4Z574LHJGHUP0
-    returnUrl: http://172.16.1.97:8080/api/v1/payment/vn-pay-callback?source=web
+    returnUrl: http://192.168.1.134:8080/api/v1/payment/vn-pay-callback?source=web
     version: 2.1.0
     command: pay
     orderType: other
