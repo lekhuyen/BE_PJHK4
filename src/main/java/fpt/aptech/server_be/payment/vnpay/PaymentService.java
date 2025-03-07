@@ -1,6 +1,5 @@
 package fpt.aptech.server_be.payment.vnpay;
 
-
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,36 +12,39 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Slf4j
 public class PaymentService {
+
     private final fpt.aptech.server_be.core.config.payment.VNPAYConfig vnPayConfig;
 
-    public PaymentDTO.VNPayResponse createVnPayPayment(HttpServletRequest request,String productId) {
+    public PaymentDTO.VNPayResponse createVnPayPayment(HttpServletRequest request, String productId) {
         try {
             log.info("✅ Bắt đầu tạo thanh toán VNPay cho productId: {}", productId);
 
-            // 1️⃣ Kiểm tra productId có hợp lệ không
             if (productId == null || productId.isEmpty()) {
                 throw new IllegalArgumentException("🚨 Lỗi: productId không hợp lệ!");
             }
 
-            // 2️⃣ Kiểm tra và lấy amount từ request
+            // Lấy và kiểm tra amount
             String amountStr = request.getParameter("amount");
             if (amountStr == null || amountStr.isEmpty()) {
                 throw new IllegalArgumentException("🚨 Lỗi: Amount is required.");
             }
 
-            // ✅ Chuyển đổi `amount` từ String thành `double` để tránh lỗi parse
             double amountDouble = Double.parseDouble(amountStr);
-            long amount = (long) (amountDouble * 100); // Chuyển về VNĐ (VNPay yêu cầu nhân 100)
+            long amount = (long) (amountDouble * 100); // VNPay yêu cầu amount * 100
 
-            // 3️⃣ Kiểm tra bankCode
+            // BankCode (nếu có)
             String bankCode = request.getParameter("bankCode");
             if (bankCode != null && bankCode.isEmpty()) {
                 bankCode = null;
             }
 
-            // 4️⃣ Chuẩn bị dữ liệu để gửi đến VNPay
+            // Sinh mới vnp_TxnRef cho giao dịch này
+            String vnpTxnRef = "ORD" + System.currentTimeMillis();
+
+            // Tạo map param gửi lên VNPay
             Map<String, String> vnpParamsMap = new HashMap<>(vnPayConfig.getVNPayConfig());
-            vnpParamsMap.put("vnp_Amount", String.valueOf(amount)); // ✅ Lưu amount dưới dạng String hợp lệ
+            vnpParamsMap.put("vnp_TxnRef", vnpTxnRef);   // Gán TxnRef mới sinh
+            vnpParamsMap.put("vnp_Amount", String.valueOf(amount));
             if (bankCode != null) {
                 vnpParamsMap.put("vnp_BankCode", bankCode);
             }
@@ -51,7 +53,7 @@ public class PaymentService {
 
             log.info("📢 VNPay Request Parameters: {}", vnpParamsMap);
 
-            // 5️⃣ Tạo URL thanh toán VNPay
+            // Sinh URL thanh toán
             String queryUrl = fpt.aptech.server_be.util.VNPayUtil.getPaymentURL(vnpParamsMap, true);
             String hashData = fpt.aptech.server_be.util.VNPayUtil.getPaymentURL(vnpParamsMap, false);
             String vnpSecureHash = fpt.aptech.server_be.util.VNPayUtil.hmacSHA512(vnPayConfig.getSecretKey(), hashData);
@@ -60,6 +62,7 @@ public class PaymentService {
             String paymentUrl = vnPayConfig.getVnp_PayUrl() + "?" + queryUrl;
 
             log.info("✅ Generated Payment URL: {}", paymentUrl);
+            log.info("🆔 vnp_TxnRef = {}", vnpTxnRef);
 
             return PaymentDTO.VNPayResponse.builder()
                     .code("ok")
@@ -67,12 +70,11 @@ public class PaymentService {
                     .paymentUrl(paymentUrl)
                     .build();
         } catch (NumberFormatException e) {
-            log.error("🚨 Lỗi: Amount không đúng định dạng! Giá trị nhận được: {}", request.getParameter("amount"));
+            log.error("🚨 Amount không đúng định dạng! Giá trị nhận được: {}", request.getParameter("amount"));
             throw new RuntimeException("Lỗi: Amount không hợp lệ! Vui lòng nhập số hợp lệ.");
         } catch (Exception e) {
-            log.error("🚨 Lỗi khi tạo thanh toán VNPay: {}", e.getMessage());
+            log.error("🚨 Lỗi khi tạo thanh toán VNPay: {}", e.getMessage(), e);
             throw new RuntimeException("Lỗi khi tạo thanh toán VNPay: " + e.getMessage());
         }
     }
-
 }
