@@ -5,9 +5,9 @@ spring:
     name: server_be
   datasource:
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-    url: jdbc:sqlserver://localhost:1433;databaseName=PJHK42;TrustServerCertificate=true
-    username: sa
-    password: 123
+    url: jdbc:sqlserver://jphk4.database.windows.net:1433;databaseName=auctionlive;encrypt=true;trustServerCertificate=true;loginTimeout=30;
+    username: auth
+    password: 123lvkLVK
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.web.servlet.HttpEncodingAutoConfiguration
   jpa:

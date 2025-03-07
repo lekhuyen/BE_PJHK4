@@ -10,7 +10,7 @@ RUN mvn clean package -DskipTests
 FROM openjdk:17-jdk-slim
 WORKDIR /app
 
-COPY --from=build /app/target/Lag5API-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=build /app/target/server_be-0.0.1-SNAPSHOT.jar app.jar
 EXPOSE 8080
 
 ENTRYPOINT ["java","-jar","app.jar"]
