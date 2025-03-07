@@ -14,6 +14,7 @@ import java.util.List;
 public class ChatRoomResponse {
     int roomId;
     String userId;
+    String sellerId;
     String buyerName;
     String sellerName;
     int item_id;
