@@ -38,6 +38,7 @@ public class ChatRoomService {
             chatRoom.setAcAuctionItem(auction_Item);
             chatRoom.setBuyer(buyer);
             chatRoom.setSeller(auction_Item.getUser());
+
              chatRoomRepository.save(chatRoom);
         return ChatRoomMapper.toChatRoomResponse(chatRoom);
         }
