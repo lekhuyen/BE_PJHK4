@@ -27,9 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -474,5 +472,45 @@ public class BiddingService {
         } catch (MessagingException e) {
             e.printStackTrace(); // Log lỗi nếu có vấn đề trong quá trình gửi email
         }
+    }
+
+    public Map<String, Object> getBiddingStats() {
+        List<Object[]> data = biddingRepository.getBiddingStatistics();
+        Map<String, Object> result = new HashMap<>();
+
+        data.forEach(row -> {
+            String itemName = (String) row[0];
+            Long count = (Long) row[1];
+            Double avgPrice = (Double) row[2];
+
+            result.put(itemName, Map.of("count", count, "avgPrice", avgPrice));
+        });
+
+        return result;
+    }
+
+    public Map<String, Object> getSuccessfulBiddingStats() {
+        List<Object[]> data = biddingRepository.getTotalBiddingAmount();
+        Map<String, Object> result = new HashMap<>();
+
+        data.forEach(row -> {
+            String itemName = (String) row[0];
+            Double totalBiddingAmount = (Double) row[1];
+            Double adminEarnings = (Double) row[2];
+
+            result.put(itemName, Map.of("totalBiddingAmount", totalBiddingAmount, "adminEarnings", adminEarnings));
+        });
+
+        return result;
+    }
+    public Map<String, Double> getTotalAdminEarnings() {
+        Double adminEarnings = biddingRepository.getTotalAdminEarnings();
+        if (adminEarnings == null) {
+            adminEarnings = 0.0;
+        }
+
+        Map<String, Double> result = new HashMap<>();
+        result.put("totalAdminEarnings", adminEarnings);
+        return result;
     }
 }

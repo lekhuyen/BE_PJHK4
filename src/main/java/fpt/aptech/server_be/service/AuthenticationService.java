@@ -74,6 +74,7 @@ public class AuthenticationService {
         var token = generateToken(user);
         return AuthenticationResponse.builder()
                 .token(token)
+                .email(user.getEmail())
                 .username(user.getName())
                 .userId(user.getId())
                 .phone(user.getPhone() == null ? "" : user.getPhone())
@@ -130,6 +131,8 @@ public class AuthenticationService {
                 .claim("address", user.getAddress())
                 .claim("isVerify", user.getIsVerify())
                 .claim("money", user.getMoney())
+                .claim("email", user.getEmail())
+
                 .build();
 
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());

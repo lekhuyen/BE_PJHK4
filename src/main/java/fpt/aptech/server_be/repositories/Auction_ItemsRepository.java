@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface Auction_ItemsRepository extends JpaRepository<Auction_Items, Integer> {
     @Query("SELECT a FROM Auction_Items a WHERE a.status = true AND a.category = :category")
@@ -70,4 +71,6 @@ public interface Auction_ItemsRepository extends JpaRepository<Auction_Items, In
     @Query("SELECT a FROM Auction_Items a WHERE a.buyer.id = :userId AND a.isPaid = false")
     List<Auction_Items> findUnWonItemsByUserId(@Param("userId") String userId);
 
+    // The findById method is already provided by JpaRepository
+    Optional<Auction_Items> findById(Integer id);
 }
