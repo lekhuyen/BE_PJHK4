@@ -174,5 +174,16 @@ public class FavoriteService {
         }).collect(Collectors.toList());
     }
 
+    // ✅ Kiểm tra xem người dùng đã follow người bán hay chưa
+    public boolean isFollowing(String userId, String auctioneerId) {
+        return favoriteRepository.existsByUserIdAndAuctioneerId(userId, auctioneerId);
+    }
+
+    public boolean isFavorite(String userId, String itemId) {
+        boolean result = favoriteRepository.existsByUserIdAndItemId(userId, itemId);
+        System.out.println("🛠 Kiểm tra yêu thích: UserId=" + userId + ", ItemId=" + itemId + ", Kết quả=" + result);
+        return result;
+    }
+
 
 }

@@ -12,6 +12,7 @@ public class AuthenticationResponse {
     String token;
     boolean authenticated;
     private String username; // ✅ Thêm trường username
+    private String email; // ✅ Thêm trường username
     private String userId;
     private String phone;
     private String address;

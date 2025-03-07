@@ -23,6 +23,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Slf4j
@@ -121,6 +122,20 @@ public class BiddingController {
         } else {
             return false;
         }
+    }
+
+    @GetMapping("/statistics")
+    public Map<String, Object> getBiddingStatistics() {
+        return biddingService.getBiddingStats();
+    }
+
+    @GetMapping("/successful-bidding")
+    public Map<String, Object> getSuccessfulBiddingStatistics() {
+        return biddingService.getSuccessfulBiddingStats();
+    }
+    @GetMapping("/admin-earnings")
+    public Map<String, Double> getTotalAdminEarnings() {
+        return biddingService.getTotalAdminEarnings();
     }
 
 }

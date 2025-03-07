@@ -13,6 +13,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+//import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+//import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
@@ -29,7 +32,9 @@ import javax.crypto.spec.SecretKeySpec;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-//    endpoint cho phep truy cap k can login
+    //private final OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService;
+
+    //    endpoint cho phep truy cap k can login
     private final String[] PUBLIC_ENDPOINTS_POST = {
             "/api/users",
             "/api/auth/login",
@@ -104,6 +109,32 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/users/verify-otp").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/users/reset-password").permitAll()
 
+                        .requestMatchers(HttpMethod.DELETE, "/api/auction/category/**").permitAll()
+
+                        .requestMatchers(HttpMethod.GET, "/api/files/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/files").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/files/**").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/files/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/files/auctionItem/**").permitAll()
+
+                        .requestMatchers(HttpMethod.POST, "/api/stripe/webhook").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/stripe/balance").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/stripe/payments").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/stripe/create-checkout-session/{productId}").permitAll()
+
+                        .requestMatchers(HttpMethod.DELETE, "/api/favorites/remove-favorite-item").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/favorites/unfollow-auctioneer").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/favorites/add-favorite-item").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/favorites/follow-auctioneer").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/favorites/get-favorite-items/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/favorites/get-followed-auctioneers/{userId}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/favorites/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/favorites/get-followers-count/{auctioneerId}").permitAll()
+
+                        .requestMatchers(HttpMethod.GET, "/api/bidding/statistics").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/bidding/successful-bidding").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/bidding/admin-earnings").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/favorites/get-comments/{auctioneerId}").permitAll()
 
                         //t
                         .requestMatchers(HttpMethod.DELETE, "/api/favorites/remove-favorite-item").permitAll()
@@ -155,6 +186,13 @@ public class SecurityConfig {
 
                         .requestMatchers("/ws/**","/signaling/**").permitAll()
 
+                        .requestMatchers(HttpMethod.GET, "/login/oauth2/code/google").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/login/oauth2/authorization/google").permitAll()
+
+                        .requestMatchers("/ws/**").permitAll()
+
+
+
                         //user co role admin moi truy cap dc
 //                        .requestMatchers(HttpMethod.GET,"/users")
 //                        .hasRole(Role.ADMIN.name())
@@ -170,12 +208,16 @@ public class SecurityConfig {
                         //    custom SCOPE_ADMIN -> ROLE_ADMIN
                         .jwtAuthenticationConverter(jwtConverter()))
                         .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
+
         );
+
+
 
 //        httpSecurity.csrf(httpSecurityCsrfConfigurer -> httpSecurityCsrfConfigurer.disable());
 //        tat csrf
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
         httpSecurity.cors(c -> c.configurationSource(corsConfigurationSource()));
+
 
         return httpSecurity.build();
     }
@@ -193,7 +235,29 @@ public class SecurityConfig {
         return jwtAuthenticationConverter;
     }
 
-
+//    public SecurityConfig(OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService) {
+//        this.oAuth2UserService = oAuth2UserService;
+//    }
+//
+//    @Bean
+//    public SecurityFilterChain filterGoogleChain(HttpSecurity httpSecurity) throws Exception {
+//        httpSecurity
+//                .authorizeHttpRequests(request -> request
+//                        .requestMatchers("/login", "/oauth2/**").permitAll()
+//                        .anyRequest().authenticated()
+//                )
+//                .oauth2Login(oauth2 -> oauth2
+//                        .loginPage("/login")
+//                        .defaultSuccessUrl("/home", true)
+//                        .failureUrl("/login?error=true")
+//                        .userInfoEndpoint(userInfo -> userInfo
+//                                .userService(oAuth2UserService) // ✅ Injected correctly
+//                        )
+//                )
+//                .csrf(csrf -> csrf.disable());
+//
+//        return httpSecurity.build();
+//    }
 
 //    decode token xem co hop le k,
 //    @Bean
