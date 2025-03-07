@@ -56,8 +56,9 @@ public class FileUploadController {
 
 
 
+
     // Upload a new file
-    @PostMapping()
+    @PostMapping("/upload")
     public ResponseEntity<FileUploadDTO> uploadFile(
             @RequestParam("file") MultipartFile file,
             @RequestParam(value = "auctionItemId", required = false) Integer auctionItemId) {
