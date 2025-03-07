@@ -25,7 +25,7 @@ public enum ErrorCode {
 
     PRODUCT_NOT_EXISTS(1009,"Product do not existed",HttpStatus.BAD_REQUEST),
     USER_INACTIVE(1010,"You had been locked",HttpStatus.BAD_REQUEST),
-
+    PRICE_TOO_LOW(1013,"Price must be lower than or equal to 0",HttpStatus.BAD_REQUEST ),
     PRICE_HIGHER_CURRENT_PRICE(1011,"Your bid must be higher than your previously bid",HttpStatus.BAD_REQUEST),
 
     SAME_CITIZEN(1012,"This identification number has been registered, please use another citizen identification number!",HttpStatus.BAD_REQUEST),

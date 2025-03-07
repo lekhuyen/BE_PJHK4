@@ -92,4 +92,7 @@ public class Auction_Items {
     @OneToMany(mappedBy = "acAuctionItem", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChatRoom> chatRooms;
 
+    @OneToMany(mappedBy = "auctionItem", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FileUploadFDF> uploadedFiles;
+
 }

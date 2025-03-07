@@ -99,5 +99,46 @@ public class FavoriteController {
         int followersCount = favoriteService.getFollowersCount(auctioneerId);
         return ResponseEntity.ok(followersCount);
     }
+    // ✅ API: Thêm đánh giá (rating)
+    @PostMapping("/add-comment")
+    public ResponseEntity<String> addComment(@RequestBody Map<String, String> payload) {
+        String userId = payload.get("userId");
+        String auctioneerId = payload.get("auctioneerId");
+        String content = payload.get("content");
 
+        boolean isAdded = favoriteService.addComment(userId, auctioneerId, content);
+        return ResponseEntity.ok(isAdded ? "Comment added successfully!" : "Failed to add comment");
+    }
+
+//    @GetMapping("/get-comments/{auctioneerId}")
+//    public ResponseEntity<List<Map<String, Object>>> getComments(@PathVariable String auctioneerId) {
+//        List<Map<String, Object>> comments = favoriteService.getComments(auctioneerId);
+//        return ResponseEntity.ok(comments);
+//    }
+
+    @GetMapping("/get-comments/{auctioneerId}")
+    public ResponseEntity<List<Map<String, Object>>> getComments(@PathVariable String auctioneerId) {
+        List<Map<String, Object>> comments = favoriteService.getComments(auctioneerId);
+        return ResponseEntity.ok(comments);
+    }
+    // ✅ API kiểm tra người dùng có follow người bán không
+    @GetMapping("/is-following")
+    public ResponseEntity<Boolean> isFollowing(
+            @RequestParam String userId,
+            @RequestParam String auctioneerId) {
+
+        boolean isFollowing = favoriteService.isFollowing(userId, auctioneerId);
+        return ResponseEntity.ok(isFollowing);
+    }
+    // ✅ API: Kiểm tra sản phẩm đã được yêu thích chưa
+    @GetMapping("/is-favorite")
+    public ResponseEntity<Boolean> isFavorite(
+            @RequestParam String userId,
+            @RequestParam String itemId) {
+
+        boolean isFavorite = favoriteService.isFavorite(userId, itemId);
+        System.out.println("🔎 Kiểm tra yêu thích: UserId = " + userId + ", ItemId = " + itemId + ", Kết quả = " + isFavorite);
+
+        return ResponseEntity.ok(isFavorite);
+    }
 }

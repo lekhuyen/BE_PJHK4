@@ -1,27 +1,21 @@
 
 spring:
+
   application:
     name: server_be
   datasource:
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-    url: jdbc:sqlserver://localhost:1433;databaseName=PJHK42;TrustServerCertificate=true;encrypt=false;sendStringParametersAsUnicode=true
+    url: jdbc:sqlserver://localhost:1433;databaseName=PJHK4;TrustServerCertificate=true
     username: sa
     password: 123
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.web.servlet.HttpEncodingAutoConfiguration
   jpa:
-    database-platform: org.hibernate.dialect.SQLServerDialect
-
     hibernate:
       ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.SQLServerDialect
-        hibernate:
-          connection:
-            CharSet: UTF-8
-            useUnicode: true
-            characterEncoding: UTF-8
   servlet:
     multipart:
       enabled: true
@@ -33,8 +27,6 @@ spring:
     host: smtp.gmail.com
     username: khuyenle541@gmail.com
     password: qzjgbglxidzmzibn
-#    username: phamduyhau2000@gmail.com
-#    password: tmag jpbi gpcv bnpf
     port: 587
     properties:
       mail:
@@ -52,7 +44,6 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
-
 jwt:
   signerKey: "pDozQy8Ihk/phzNwDBNzRmuWvnA6YkDg/D1mmO4FpejrQJ3kVTf10AcELK1qJnGW"
   valid-duration: 360000 #second
@@ -68,12 +59,15 @@ payment:
     url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
     tmnCode: GLI8RRMU
     secretKey: A7G4E6A8TGB8TO0J2FR4Z574LHJGHUP0
-    returnUrl: https://172.16.1.94:8080/api/v1/payment/vn-pay-callback?source=web
+    returnUrl: http://172.16.1.97:8080/api/v1/payment/vn-pay-callback?source=web
     version: 2.1.0
     command: pay
     orderType: other
-
-
+  stripe:
+    secretKey: sk_test_51QzXY62NueUWgxdgKeJNVZaUT6DdPq0k5HztYTwDtdcYuXvaKg3PeGTiNR5ikoxlZ1tlwjwPaKbjfDsWIXqkCLBN00QTQTahM6
+    publishableKey: pk_test_51QzXY62NueUWgxdg6B8LQaTl7VMRdQYocaXHVvi20N3WxUE08zM5gg9JPlRcDZCMNIMXw7ZLsj7YwV6QacadD26L00phbNL9px
+    currency: usd
+    webhookSecret: whsec_FS1pOMPZt4p4lREbZWJwiNSnXzCvEvCO
 kafka:
   topic:
     auction:
@@ -86,3 +80,6 @@ server:
       force: true
 
 
+openai:
+  api:
+    key: "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"  # Thay bằng key của bạn
