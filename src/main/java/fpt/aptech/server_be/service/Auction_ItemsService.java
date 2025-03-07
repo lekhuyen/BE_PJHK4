@@ -6,18 +6,12 @@ import fpt.aptech.server_be.dto.request.Auction_ItemsRequest;
 import fpt.aptech.server_be.dto.response.Auction_ItemsResponse;
 import fpt.aptech.server_be.dto.response.NotificationAuctionItemResponse;
 import fpt.aptech.server_be.dto.response.PageResponse;
-import fpt.aptech.server_be.entities.Auction_Items;
-import fpt.aptech.server_be.entities.Category;
-import fpt.aptech.server_be.entities.NotificationAuctionItem;
-import fpt.aptech.server_be.entities.User;
+import fpt.aptech.server_be.entities.*;
 import fpt.aptech.server_be.exception.AppException;
 import fpt.aptech.server_be.exception.ErrorCode;
 import fpt.aptech.server_be.mapper.Auction_ItemsMapper;
 import fpt.aptech.server_be.mapper.NotificationAuctionItemMapper;
-import fpt.aptech.server_be.repositories.Auction_ItemsRepository;
-import fpt.aptech.server_be.repositories.CategoryRepository;
-import fpt.aptech.server_be.repositories.NotificationAuctionItemRepository;
-import fpt.aptech.server_be.repositories.UserRepository;
+import fpt.aptech.server_be.repositories.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -27,6 +21,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.awt.print.Pageable;
@@ -47,7 +42,7 @@ public class Auction_ItemsService {
     private final CategoryRepository categoryRepository;
     private final SimpMessagingTemplate messagingTemplate;
     UserRepository userRepository;
-
+    private final FileUploadFDFRepository fileUploadFDFRepository;
 
 
     public Auction_ItemsResponse getAuction_ItemsById(Integer item_id) {
@@ -253,39 +248,65 @@ public class Auction_ItemsService {
 
 
 
+    @Transactional
     public void addAuction_Items(Auction_ItemsRequest request) {
-
-        User user = userRepository.findById(request.getUserId()).orElseThrow(() -> new RuntimeException("User not found"));
+        // Fetch user
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         List<MultipartFile> images = request.getImages();
-
         List<String> fileNames = new ArrayList<>();
 
-        for (MultipartFile image : images) {
-            String fileName = image.getOriginalFilename();
-
-            if(fileName != null && !fileName.isEmpty()) {
-                try {
-                    Map uploadResult = cloudinary.uploader().upload(image.getBytes(), ObjectUtils.emptyMap());
-                    String fileUrl = uploadResult.get("url").toString();
-
-                    fileNames.add(fileUrl);
-                } catch (Exception e) {
-                    throw new RuntimeException("Error uploading image: " + fileName, e);
+        // Upload images to Cloudinary
+        if (images != null) {
+            for (MultipartFile image : images) {
+                String fileName = image.getOriginalFilename();
+                if (fileName != null && !fileName.isEmpty()) {
+                    try {
+                        Map<?, ?> uploadResult = cloudinary.uploader().upload(image.getBytes(), ObjectUtils.emptyMap());
+                        String fileUrl = uploadResult.get("url").toString();
+                        fileNames.add(fileUrl);
+                    } catch (Exception e) {
+                        throw new RuntimeException("Error uploading image: " + fileName, e);
+                    }
                 }
             }
         }
+
+        // Convert request to Auction_Items
         Auction_Items auction_Items = Auction_ItemsMapper.toAuction_Items(request);
         auction_Items.setImages(fileNames);
 
-
+        // Fetch and set category
         Category category = categoryRepository.findById(request.getCategory_id())
-                    .orElseThrow(() -> new RuntimeException("Category not found"));
-            auction_Items.setCategory(category);
-         auction_ItemsRepository.save(auction_Items);
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+        auction_Items.setCategory(category);
 
+        // ✅ Save auction item first to generate ID
+        auction_Items = auction_ItemsRepository.save(auction_Items);
 
-//         thong bao
+        // ✅ Now process file uploads AFTER auction item has an ID
+        if (request.getFileUploads() != null) {
+            List<FileUploadFDF> uploadedFiles = new ArrayList<>();
+            for (MultipartFile file : request.getFileUploads()) {
+                try {
+                    FileUploadFDF newFile = new FileUploadFDF();
+                    newFile.setFileName(file.getOriginalFilename());
+                    newFile.setFileType(file.getContentType());
+                    newFile.setFileData(file.getBytes());
+                    newFile.setAuctionItem(auction_Items); // ✅ Now we have an ID, so this works!
+
+                    uploadedFiles.add(newFile);
+                } catch (Exception e) {
+                    throw new RuntimeException("Error processing file: " + file.getOriginalFilename(), e);
+                }
+            }
+
+            // ✅ Save uploaded files after linking them to the auction item
+            fileUploadFDFRepository.saveAll(uploadedFiles);
+        }
+
+        // Create and save notification
         NotificationAuctionItem notificationAuctionItem = new NotificationAuctionItem();
         notificationAuctionItem.setAuctionItemId(auction_Items.getItem_id());
         notificationAuctionItem.setCreatedAt(new Date());
@@ -295,12 +316,13 @@ public class Auction_ItemsService {
 
         notificationAuctionItemRepository.save(notificationAuctionItem);
 
-        NotificationAuctionItemResponse notificationAuctionItemResponse = NotificationAuctionItemMapper
-                .toNotificationAuctionItemResponse(notificationAuctionItem);
+        // Send notification
+        NotificationAuctionItemResponse notificationAuctionItemResponse =
+                NotificationAuctionItemMapper.toNotificationAuctionItemResponse(notificationAuctionItem);
+
         messagingTemplate.convertAndSend("/topic/notification/product", notificationAuctionItemResponse);
-
-
     }
+
 
     public void updateAuction_Items(Auction_ItemsRequest request) throws IOException {
         Auction_Items auction_Items = auction_ItemsRepository.findById(request.getItem_id())

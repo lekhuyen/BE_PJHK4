@@ -1,5 +1,6 @@
 package fpt.aptech.server_be.dto.request;
 
+import fpt.aptech.server_be.entities.FileUploadFDF;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,5 +30,7 @@ public class Auction_ItemsRequest {
 
     String userId;
     int category_id;
+
+    List<MultipartFile> fileUploads; // ✅ FIXED: Accepts file uploads from frontend
 }
 
