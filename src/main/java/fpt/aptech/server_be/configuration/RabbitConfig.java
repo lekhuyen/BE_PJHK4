@@ -1,6 +1,7 @@
 package fpt.aptech.server_be.configuration;
 
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
@@ -16,6 +17,14 @@ public class RabbitConfig {
     public static final String EXCHANGE = "rabbit_mq_exchange";
     public static final String ROUTING_KEY = "rabbit_mq_r_key";
     public static final String DLQ_ROUTING_KEY = "dlq_r_key";
+
+
+    @Bean
+    public ConnectionFactory connectionFactory() {
+        CachingConnectionFactory factory = new CachingConnectionFactory();
+        factory.setUri("amqps://ixvxgtrj:NuqKkp-eIyM5bLWNNxeECbNiU-7W_V8_@fuji.lmq.cloudamqp.com/ixvxgtrj");
+        return factory;
+    }
 
     @Bean
     public DirectExchange exchange() {

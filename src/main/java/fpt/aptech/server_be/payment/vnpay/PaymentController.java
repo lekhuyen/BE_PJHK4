@@ -192,7 +192,7 @@ public class PaymentController {
             if (userAgent != null && userAgent.contains("Mobile")) {
                 response.sendRedirect("myapp://mybids"); // 🔥 Mobile chuyển hướng về app
             } else {
-                response.sendRedirect("http://localhost:3000/manager-post"); // 🔥 React chuyển hướng về web
+                response.sendRedirect("http://localhost:3000/profile-page"); // 🔥 React chuyển hướng về web
             }
 
         } catch (Exception e) {
@@ -201,24 +201,24 @@ public class PaymentController {
         }
     }
 
-    @GetMapping("/vn-pay-callback-mobile")
-    public void payCallbackHandlerMobile(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String status = request.getParameter("vnp_ResponseCode");
-        String orderInfo = request.getParameter("vnp_OrderInfo");
-        String productId = orderInfo.replace("Thanh toán cho sản phẩm ID: ", ""); // Lọc productId
-
-        log.info("✅ Thanh toán thành công - productId: {}", productId);
-
-        Auction_Items auctionItems = auction_ItemsRepository.findById(Integer.parseInt(productId)).get();
-        auctionItems.setSoldout(true);
-        auctionItems.setPaid(true);
-        auction_ItemsRepository.save(auctionItems);
-
-
-        String redirectUrl = String.format("http://localhost:3000/profile-page");
-
-        response.sendRedirect(redirectUrl);
-    }
+//    @GetMapping("/vn-pay-callback-mobile")
+//    public void payCallbackHandlerMobile(HttpServletRequest request, HttpServletResponse response) throws IOException {
+//        String status = request.getParameter("vnp_ResponseCode");
+//        String orderInfo = request.getParameter("vnp_OrderInfo");
+//        String productId = orderInfo.replace("Thanh toán cho sản phẩm ID: ", ""); // Lọc productId
+//
+//        log.info("✅ Thanh toán thành công - productId: {}", productId);
+//
+//        Auction_Items auctionItems = auction_ItemsRepository.findById(Integer.parseInt(productId)).get();
+//        auctionItems.setSoldout(true);
+//        auctionItems.setPaid(true);
+//        auction_ItemsRepository.save(auctionItems);
+//
+//
+//        String redirectUrl = String.format("http://localhost:3000/profile-page");
+//
+//        response.sendRedirect(redirectUrl);
+//    }
 
 //    mobile
 @GetMapping("/bids/{userId}")

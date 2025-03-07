@@ -47,7 +47,7 @@ public class UserMapper {
         userResponse.setCiNumber(user.getCiNumber());
         userResponse.setAddress(user.getAddress());
         userResponse.setIsVerify(user.getIsVerify() != null ? user.getIsVerify() : false);
-        userResponse.setMoney(user.getMoney());
+        userResponse.setMoney(user.getMoney() != null ? user.getMoney() : 0.0);
 
 
         UserCitizenResponse userCitizenResponse = new UserCitizenResponse();
