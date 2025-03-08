@@ -2,9 +2,11 @@ package fpt.aptech.server_be.controller;
 
 import fpt.aptech.server_be.service.FavoriteService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -18,58 +20,55 @@ public class FavoriteController {
     // ✅ API Yêu Thích Sản Phẩm
     @PostMapping("/add-favorite-item")
     public ResponseEntity<String> addFavoriteItem(@RequestParam String userId, @RequestParam String itemId) {
+        System.out.println("📥 Nhận yêu cầu thêm sản phẩm yêu thích: UserId = " + userId + ", ItemId = " + itemId);
+
         boolean isAdded = favoriteService.addFavoriteItem(userId, itemId);
+
         return ResponseEntity.ok(isAdded ? "Added to favorites!" : "Already in favorites");
     }
-
     // ✅ API Follow Nhà Đấu Giá
     // ✅ API Follow Nhà Đấu Giá với xác thực
     @PostMapping("/follow-auctioneer")
-    public ResponseEntity<String> followAuctioneer(@RequestHeader(value = "Authorization", required = false) String token, @RequestBody Map<String, String> payload) {
+    public ResponseEntity<String> followAuctioneer(@RequestBody Map<String, String> payload) {
         String userId = payload.get("userId");
         String auctioneerId = payload.get("auctioneerId");
 
-        System.out.println("📥 Nhận yêu cầu Follow từ userId: " + userId + ", auctioneerId: " + auctioneerId);
-        System.out.println("🔑 Token: " + token);
+        System.out.println("📥 Nhận yêu cầu Follow: UserId = " + userId + ", AuctioneerId = " + auctioneerId);
 
         if (userId == null || auctioneerId == null) {
-            return ResponseEntity.badRequest().body("Missing userId or auctioneerId");
+            return ResponseEntity.badRequest().body("❌ Thiếu userId hoặc auctioneerId");
         }
 
         boolean isFollowed = favoriteService.followAuctioneer(userId, auctioneerId);
         return ResponseEntity.ok(isFollowed ? "Followed successfully!" : "Already followed");
     }
 
-
-
-
-    // ✅ API Lấy danh sách sản phẩm yêu thích
-//    @GetMapping("/get-favorite-items/{userId}")
-//    public ResponseEntity<List<String>> getFavoriteItems(@PathVariable String userId) {
-//        List<String> favoriteItems = favoriteService.getFavoriteItems(userId);
-//        return ResponseEntity.ok(favoriteItems);
-//    }
-// ✅ API Lấy danh sách sản phẩm yêu thích với thông tin đầy đủ
     @GetMapping("/get-favorite-items/{userId}")
-    public ResponseEntity<List<Map<String, Object>>> getFavoriteItems(@PathVariable String userId) {
-        List<Map<String, Object>> favoriteItems = favoriteService.getFavoriteItemsWithDetails(userId);
-        return ResponseEntity.ok(favoriteItems);
+    public ResponseEntity<?> getFavoriteItems(@PathVariable String userId) {
+        System.out.println("📥 Nhận yêu cầu lấy sản phẩm yêu thích với userId: " + userId);
+
+        try {
+            List<Map<String, Object>> favoriteItems = favoriteService.getFavoriteItemsWithDetails(userId);
+
+            if (favoriteItems == null || favoriteItems.isEmpty()) {
+                System.out.println("🔍 Không tìm thấy sản phẩm yêu thích cho userId: " + userId);
+                return ResponseEntity.ok(Collections.emptyList()); // ✅ Trả về danh sách rỗng thay vì lỗi
+            }
+
+            return ResponseEntity.ok(favoriteItems);
+        } catch (Exception e) {
+            System.out.println("❌ Lỗi khi lấy danh sách sản phẩm yêu thích: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("❌ Lỗi: " + e.getMessage());
+        }
     }
 
-    // ✅ API Lấy danh sách Nhà Đấu Giá đã Follow
-//    @GetMapping("/get-followed-auctioneers/{userId}")
-//    public ResponseEntity<List<String>> getFollowedAuctioneers(@PathVariable String userId) {
-//        List<String> followedAuctioneers = favoriteService.getFollowedAuctioneers(userId);
-//        return ResponseEntity.ok(followedAuctioneers);
-//    }
     // ✅ API Lấy danh sách Nhà Đấu Giá đã Follow với thông tin đầy đủ
     @GetMapping("/get-followed-auctioneers/{userId}")
     public ResponseEntity<List<Map<String, Object>>> getFollowedAuctioneers(@PathVariable String userId) {
         List<Map<String, Object>> followedAuctioneers = favoriteService.getFollowedAuctioneersWithDetails(userId);
+        System.out.println("📌 Người bán đã follow: " + followedAuctioneers);
         return ResponseEntity.ok(followedAuctioneers);
     }
-
-
 
     // ✅ API Hủy Follow Nhà Đấu Giá
     @DeleteMapping("/unfollow-auctioneer")
@@ -82,6 +81,7 @@ public class FavoriteController {
         boolean isUnfollowed = favoriteService.unfollowAuctioneer(userId, auctioneerId);
         return ResponseEntity.ok(isUnfollowed ? "Unfollowed successfully!" : "Not following this auctioneer");
     }
+
     // ✅ API Hủy Yêu Thích Sản Phẩm
     @DeleteMapping("/remove-favorite-item")
     public ResponseEntity<String> removeFavoriteItem(
@@ -99,22 +99,22 @@ public class FavoriteController {
         int followersCount = favoriteService.getFollowersCount(auctioneerId);
         return ResponseEntity.ok(followersCount);
     }
+
     // ✅ API: Thêm đánh giá (rating)
     @PostMapping("/add-comment")
     public ResponseEntity<String> addComment(@RequestBody Map<String, String> payload) {
         String userId = payload.get("userId");
-        String auctioneerId = payload.get("auctioneerId");
+        String auctioneerId = payload.get("auctioneerId"); // Đảm bảo auctioneerId có giá trị
         String content = payload.get("content");
+
+        // Kiểm tra xem auctioneerId có hợp lệ không
+        if (auctioneerId == null || auctioneerId.isEmpty()) {
+            return ResponseEntity.badRequest().body("auctioneerId không hợp lệ!");
+        }
 
         boolean isAdded = favoriteService.addComment(userId, auctioneerId, content);
         return ResponseEntity.ok(isAdded ? "Comment added successfully!" : "Failed to add comment");
     }
-
-//    @GetMapping("/get-comments/{auctioneerId}")
-//    public ResponseEntity<List<Map<String, Object>>> getComments(@PathVariable String auctioneerId) {
-//        List<Map<String, Object>> comments = favoriteService.getComments(auctioneerId);
-//        return ResponseEntity.ok(comments);
-//    }
 
     @GetMapping("/get-comments/{auctioneerId}")
     public ResponseEntity<List<Map<String, Object>>> getComments(@PathVariable String auctioneerId) {
