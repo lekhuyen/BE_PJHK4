@@ -11,6 +11,6 @@ public class WebSocketConfigg implements WebSocketConfigurer {
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(new SignalingHandler(), "/signaling")
-                .setAllowedOrigins("http://localhost:3000"); // Origin của frontend
+                .setAllowedOrigins("*"); // Origin của frontend
     }
 }
